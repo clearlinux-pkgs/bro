@@ -6,7 +6,7 @@
 #
 Name     : bro
 Version  : 2.5.5
-Release  : 1
+Release  : 2
 URL      : https://www.bro.org/downloads/bro-2.5.5.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.5.5.tar.gz
 Source99 : https://www.bro.org/downloads/bro-2.5.5.tar.gz.asc
@@ -25,6 +25,7 @@ BuildRequires : flex
 BuildRequires : glibc-dev
 BuildRequires : gperf
 BuildRequires : gperftools
+BuildRequires : gperftools-dev
 BuildRequires : libpcap-dev
 BuildRequires : openssl-dev
 BuildRequires : python3
@@ -32,6 +33,7 @@ BuildRequires : python3-dev
 BuildRequires : ruby
 BuildRequires : swig
 BuildRequires : zlib-dev
+Patch1: CVE-2018-16807.patch
 
 %description
 Broccoli enables your applications to speak the Bro communication protocol,
@@ -89,21 +91,26 @@ man components for the bro package.
 
 %prep
 %setup -q -n bro-2.5.5
+%patch1 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1540561640
+export SOURCE_DATE_EPOCH=1541029672
 mkdir -p clr-build
 pushd clr-build
+export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
+export CXXFLAGS="$CXXFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 %cmake ..
 make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1540561640
+export SOURCE_DATE_EPOCH=1541029672
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
