@@ -5,35 +5,47 @@
 # Source0 file verified with key 0xC68B494DF56ACC7E (info@bro.org)
 #
 Name     : bro
-Version  : 2.5.5
-Release  : 2
-URL      : https://www.bro.org/downloads/bro-2.5.5.tar.gz
-Source0  : https://www.bro.org/downloads/bro-2.5.5.tar.gz
-Source99 : https://www.bro.org/downloads/bro-2.5.5.tar.gz.asc
+Version  : 2.6
+Release  : 3
+URL      : https://www.bro.org/downloads/bro-2.6.tar.gz
+Source0  : https://www.bro.org/downloads/bro-2.6.tar.gz
+Source99 : https://www.bro.org/downloads/bro-2.6.tar.gz.asc
 Summary  : The Bro Client Communications Library
 Group    : Development/Tools
-License  : BSD-3-Clause CC-BY-4.0 NCSA
+License  : BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC-BY-4.0 NCSA
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
 Requires: bro-license = %{version}-%{release}
 Requires: bro-man = %{version}-%{release}
+Requires: bro-plugins = %{version}-%{release}
+Requires: bro-python = %{version}-%{release}
+Requires: bro-python3 = %{version}-%{release}
+Requires: Sphinx
+Requires: sphinx_rtd_theme
+BuildRequires : bash coreutils gzip
+BuildRequires : beignet-dev
 BuildRequires : bison
 BuildRequires : bison-dev
+BuildRequires : boost-dev
 BuildRequires : buildreq-cmake
 BuildRequires : buildreq-distutils3
+BuildRequires : curl-dev
+BuildRequires : doxygen
 BuildRequires : flex
+BuildRequires : git
 BuildRequires : glibc-dev
 BuildRequires : gperf
 BuildRequires : gperftools
 BuildRequires : gperftools-dev
 BuildRequires : libpcap-dev
 BuildRequires : openssl-dev
+BuildRequires : protobuf-dev
 BuildRequires : python3
 BuildRequires : python3-dev
+BuildRequires : qtbase-dev mesa-dev
 BuildRequires : ruby
-BuildRequires : swig
+BuildRequires : texlive
 BuildRequires : zlib-dev
-Patch1: CVE-2018-16807.patch
 
 %description
 Broccoli enables your applications to speak the Bro communication protocol,
@@ -89,16 +101,41 @@ Group: Default
 man components for the bro package.
 
 
+%package plugins
+Summary: plugins components for the bro package.
+Group: Default
+
+%description plugins
+plugins components for the bro package.
+
+
+%package python
+Summary: python components for the bro package.
+Group: Default
+Requires: bro-python3 = %{version}-%{release}
+
+%description python
+python components for the bro package.
+
+
+%package python3
+Summary: python3 components for the bro package.
+Group: Default
+Requires: python3-core
+
+%description python3
+python3 components for the bro package.
+
+
 %prep
-%setup -q -n bro-2.5.5
-%patch1 -p1
+%setup -q -n bro-2.6
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1541029672
+export SOURCE_DATE_EPOCH=1543575559
 mkdir -p clr-build
 pushd clr-build
 export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
@@ -110,30 +147,46 @@ make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1541029672
+export SOURCE_DATE_EPOCH=1543575559
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
+cp aux/bifcl/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_bifcl_COPYING
+cp aux/bifcl/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_bifcl_cmake_COPYING
 cp aux/binpac/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_binpac_COPYING
+cp aux/binpac/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_binpac_cmake_COPYING
 cp aux/bro-aux/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_bro-aux_COPYING
+cp aux/bro-aux/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_bro-aux_cmake_COPYING
 cp aux/bro-aux/plugin-support/skeleton/COPYING.edit-me %{buildroot}/usr/share/package-licenses/bro/aux_bro-aux_plugin-support_skeleton_COPYING.edit-me
 cp aux/broccoli/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_COPYING
 cp aux/broccoli/bindings/broccoli-python/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-python_COPYING
+cp aux/broccoli/bindings/broccoli-python/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-python_cmake_COPYING
 cp aux/broccoli/bindings/broccoli-ruby/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-ruby_COPYING
+cp aux/broccoli/bindings/broccoli-ruby/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-ruby_cmake_COPYING
+cp aux/broccoli/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_cmake_COPYING
 cp aux/broctl/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_COPYING
 cp aux/broctl/aux/capstats/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_capstats_COPYING
+cp aux/broctl/aux/capstats/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_capstats_cmake_COPYING
 cp aux/broctl/aux/pysubnettree/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_pysubnettree_COPYING
+cp aux/broctl/aux/pysubnettree/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_pysubnettree_cmake_COPYING
 cp aux/broctl/aux/trace-summary/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_trace-summary_COPYING
-cp aux/broker/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broker_COPYING
+cp aux/broctl/aux/trace-summary/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_trace-summary_cmake_COPYING
+cp aux/broctl/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_cmake_COPYING
+cp aux/broker/3rdparty/caf/LICENSE %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE
+cp aux/broker/3rdparty/caf/LICENSE_ALTERNATIVE %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE_ALTERNATIVE
+cp aux/broker/3rdparty/caf/libcaf_python/third_party/pybind/LICENSE %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
+cp aux/broker/3rdparty/caf/libcaf_python/third_party/pybind/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
+cp aux/broker/bindings/python/3rdparty/pybind11/LICENSE %{buildroot}/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_LICENSE
+cp aux/broker/bindings/python/3rdparty/pybind11/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_tools_clang_LICENSE.TXT
+cp aux/broker/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broker_cmake_COPYING
 cp aux/btest/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_btest_COPYING
 cp aux/netcontrol-connectors/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_netcontrol-connectors_COPYING
-cp aux/plugins/elasticsearch/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_plugins_elasticsearch_COPYING
-cp aux/plugins/kafka/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_plugins_kafka_COPYING
-cp aux/plugins/myricom/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_plugins_myricom_COPYING
-cp aux/plugins/netmap/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_plugins_netmap_COPYING
-cp aux/plugins/pf_ring/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_plugins_pf_ring_COPYING
-cp aux/plugins/redis/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_plugins_redis_COPYING
+cp cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/cmake_COPYING
 cp doc/LICENSE %{buildroot}/usr/share/package-licenses/bro/doc_LICENSE
+cp src/3rdparty/caf/LICENSE %{buildroot}/usr/share/package-licenses/bro/src_3rdparty_caf_LICENSE
+cp src/3rdparty/caf/LICENSE_ALTERNATIVE %{buildroot}/usr/share/package-licenses/bro/src_3rdparty_caf_LICENSE_ALTERNATIVE
+cp src/3rdparty/caf/libcaf_python/third_party/pybind/LICENSE %{buildroot}/usr/share/package-licenses/bro/src_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
+cp src/3rdparty/caf/libcaf_python/third_party/pybind/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/src_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
 pushd clr-build
 %make_install
 popd
@@ -146,6 +199,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 
 %files bin
 %defattr(-,root,root,-)
+/usr/bin/bifcl
 /usr/bin/binpac
 /usr/bin/bro
 /usr/bin/bro-config
@@ -166,6 +220,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/bif/input.bif.bro
 /usr/share/bro/base/bif/logging.bif.bro
 /usr/share/bro/base/bif/messaging.bif.bro
+/usr/share/bro/base/bif/option.bif.bro
 /usr/share/bro/base/bif/pcap.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_ARP.events.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_AsciiReader.ascii.bif.bro
@@ -174,12 +229,14 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/bif/plugins/Bro_BenchmarkReader.benchmark.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_BinaryReader.binary.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_BitTorrent.events.bif.bro
+/usr/share/bro/base/bif/plugins/Bro_ConfigReader.config.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_ConnSize.events.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_ConnSize.functions.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_DCE_RPC.consts.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_DCE_RPC.events.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_DCE_RPC.types.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_DHCP.events.bif.bro
+/usr/share/bro/base/bif/plugins/Bro_DHCP.types.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_DNP3.events.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_DNS.events.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_FTP.events.bif.bro
@@ -239,6 +296,8 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/bif/plugins/Bro_SMB.smb1_com_session_setup_andx.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_SMB.smb1_com_transaction.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_SMB.smb1_com_transaction2.bif.bro
+/usr/share/bro/base/bif/plugins/Bro_SMB.smb1_com_transaction2_secondary.bif.bro
+/usr/share/bro/base/bif/plugins/Bro_SMB.smb1_com_transaction_secondary.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_SMB.smb1_com_tree_connect_andx.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_SMB.smb1_com_tree_disconnect.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_SMB.smb1_com_write_andx.bif.bro
@@ -276,6 +335,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/bif/plugins/Bro_Unified2.types.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_X509.events.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_X509.functions.bif.bro
+/usr/share/bro/base/bif/plugins/Bro_X509.ocsp_events.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_X509.types.bif.bro
 /usr/share/bro/base/bif/plugins/Bro_XMPP.events.bif.bro
 /usr/share/bro/base/bif/plugins/__load__.bro
@@ -299,6 +359,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/frameworks/analyzer/__load__.bro
 /usr/share/bro/base/frameworks/analyzer/main.bro
 /usr/share/bro/base/frameworks/broker/__load__.bro
+/usr/share/bro/base/frameworks/broker/log.bro
 /usr/share/bro/base/frameworks/broker/main.bro
 /usr/share/bro/base/frameworks/broker/store.bro
 /usr/share/bro/base/frameworks/cluster/__load__.bro
@@ -307,9 +368,12 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/frameworks/cluster/nodes/manager.bro
 /usr/share/bro/base/frameworks/cluster/nodes/proxy.bro
 /usr/share/bro/base/frameworks/cluster/nodes/worker.bro
+/usr/share/bro/base/frameworks/cluster/pools.bro
 /usr/share/bro/base/frameworks/cluster/setup-connections.bro
-/usr/share/bro/base/frameworks/communication/__load__.bro
-/usr/share/bro/base/frameworks/communication/main.bro
+/usr/share/bro/base/frameworks/config/__load__.bro
+/usr/share/bro/base/frameworks/config/input.bro
+/usr/share/bro/base/frameworks/config/main.bro
+/usr/share/bro/base/frameworks/config/weird.bro
 /usr/share/bro/base/frameworks/control/__load__.bro
 /usr/share/bro/base/frameworks/control/main.bro
 /usr/share/bro/base/frameworks/dpd/__load__.bro
@@ -330,6 +394,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/frameworks/input/readers/ascii.bro
 /usr/share/bro/base/frameworks/input/readers/benchmark.bro
 /usr/share/bro/base/frameworks/input/readers/binary.bro
+/usr/share/bro/base/frameworks/input/readers/config.bro
 /usr/share/bro/base/frameworks/input/readers/raw.bro
 /usr/share/bro/base/frameworks/input/readers/sqlite.bro
 /usr/share/bro/base/frameworks/intel/__load__.bro
@@ -366,10 +431,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/frameworks/notice/actions/email_admin.bro
 /usr/share/bro/base/frameworks/notice/actions/page.bro
 /usr/share/bro/base/frameworks/notice/actions/pp-alarms.bro
-/usr/share/bro/base/frameworks/notice/cluster.bro
-/usr/share/bro/base/frameworks/notice/extend-email/hostnames.bro
 /usr/share/bro/base/frameworks/notice/main.bro
-/usr/share/bro/base/frameworks/notice/non-cluster.bro
 /usr/share/bro/base/frameworks/notice/weird.bro
 /usr/share/bro/base/frameworks/openflow/__load__.bro
 /usr/share/bro/base/frameworks/openflow/cluster.bro
@@ -412,6 +474,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/frameworks/tunnels/main.bro
 /usr/share/bro/base/init-bare.bro
 /usr/share/bro/base/init-default.bro
+/usr/share/bro/base/init-frameworks-and-bifs.bro
 /usr/share/bro/base/misc/find-checksum-offloading.bro
 /usr/share/bro/base/misc/find-filtered-trace.bro
 /usr/share/bro/base/misc/p0f.fp
@@ -430,7 +493,6 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/protocols/dhcp/consts.bro
 /usr/share/bro/base/protocols/dhcp/dpd.sig
 /usr/share/bro/base/protocols/dhcp/main.bro
-/usr/share/bro/base/protocols/dhcp/utils.bro
 /usr/share/bro/base/protocols/dnp3/__load__.bro
 /usr/share/bro/base/protocols/dnp3/consts.bro
 /usr/share/bro/base/protocols/dnp3/dpd.sig
@@ -491,6 +553,11 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/protocols/smb/const-dos-error.bro
 /usr/share/bro/base/protocols/smb/const-nt-status.bro
 /usr/share/bro/base/protocols/smb/consts.bro
+/usr/share/bro/base/protocols/smb/dpd.sig
+/usr/share/bro/base/protocols/smb/files.bro
+/usr/share/bro/base/protocols/smb/main.bro
+/usr/share/bro/base/protocols/smb/smb1-main.bro
+/usr/share/bro/base/protocols/smb/smb2-main.bro
 /usr/share/bro/base/protocols/smtp/__load__.bro
 /usr/share/bro/base/protocols/smtp/dpd.sig
 /usr/share/bro/base/protocols/smtp/entities.bro
@@ -507,6 +574,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/protocols/ssh/main.bro
 /usr/share/bro/base/protocols/ssl/__load__.bro
 /usr/share/bro/base/protocols/ssl/consts.bro
+/usr/share/bro/base/protocols/ssl/ct-list.bro
 /usr/share/bro/base/protocols/ssl/dpd.sig
 /usr/share/bro/base/protocols/ssl/files.bro
 /usr/share/bro/base/protocols/ssl/main.bro
@@ -528,6 +596,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/utils/exec.bro
 /usr/share/bro/base/utils/files.bro
 /usr/share/bro/base/utils/geoip-distance.bro
+/usr/share/bro/base/utils/hash_hrw.bro
 /usr/share/bro/base/utils/json.bro
 /usr/share/bro/base/utils/numbers.bro
 /usr/share/bro/base/utils/paths.bro
@@ -540,7 +609,67 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/utils/urls.bro
 /usr/share/bro/broxygen/__load__.bro
 /usr/share/bro/broxygen/example.bro
-/usr/share/bro/policy/frameworks/communication/listen.bro
+/usr/share/bro/cmake/AddUninstallTarget.cmake
+/usr/share/bro/cmake/BifCl.cmake
+/usr/share/bro/cmake/BinPAC.cmake
+/usr/share/bro/cmake/BroPlugin.cmake
+/usr/share/bro/cmake/BroPluginCommon.cmake
+/usr/share/bro/cmake/BroPluginDynamic.cmake
+/usr/share/bro/cmake/BroPluginStatic.cmake
+/usr/share/bro/cmake/BroSubdir.cmake
+/usr/share/bro/cmake/COPYING
+/usr/share/bro/cmake/ChangeMacInstallNames.cmake
+/usr/share/bro/cmake/CheckCompilers.cmake
+/usr/share/bro/cmake/CheckFunctions.cmake
+/usr/share/bro/cmake/CheckHeaders.cmake
+/usr/share/bro/cmake/CheckNameserCompat.cmake
+/usr/share/bro/cmake/CheckOptionalBuildSources.cmake
+/usr/share/bro/cmake/CheckTypes.cmake
+/usr/share/bro/cmake/CommonCMakeConfig.cmake
+/usr/share/bro/cmake/ConfigurePackaging.cmake
+/usr/share/bro/cmake/FindBIND.cmake
+/usr/share/bro/cmake/FindBISON.cmake
+/usr/share/bro/cmake/FindBinPAC.cmake
+/usr/share/bro/cmake/FindBro.cmake
+/usr/share/bro/cmake/FindBroccoli.cmake
+/usr/share/bro/cmake/FindBroker.cmake
+/usr/share/bro/cmake/FindCAF.cmake
+/usr/share/bro/cmake/FindCapstats.cmake
+/usr/share/bro/cmake/FindGooglePerftools.cmake
+/usr/share/bro/cmake/FindJeMalloc.cmake
+/usr/share/bro/cmake/FindLibKrb5.cmake
+/usr/share/bro/cmake/FindLibMMDB.cmake
+/usr/share/bro/cmake/FindPCAP.cmake
+/usr/share/bro/cmake/FindPyBroccoli.cmake
+/usr/share/bro/cmake/FindPythonDev.cmake
+/usr/share/bro/cmake/FindReadline.cmake
+/usr/share/bro/cmake/FindRequiredPackage.cmake
+/usr/share/bro/cmake/FindRocksDB.cmake
+/usr/share/bro/cmake/FindSubnetTree.cmake
+/usr/share/bro/cmake/FindTraceSummary.cmake
+/usr/share/bro/cmake/GetArchitecture.cmake
+/usr/share/bro/cmake/InstallClobberImmune.cmake
+/usr/share/bro/cmake/InstallPackageConfigFile.cmake
+/usr/share/bro/cmake/InstallShellScript.cmake
+/usr/share/bro/cmake/InstallSymlink.cmake
+/usr/share/bro/cmake/MAC_PACKAGE_INTRO
+/usr/share/bro/cmake/MacDependencyPaths.cmake
+/usr/share/bro/cmake/MiscTests.cmake
+/usr/share/bro/cmake/OSSpecific.cmake
+/usr/share/bro/cmake/OpenSSLTests.cmake
+/usr/share/bro/cmake/PCAPTests.cmake
+/usr/share/bro/cmake/ProhibitInSourceBuild.cmake
+/usr/share/bro/cmake/README
+/usr/share/bro/cmake/RequireCXX11.cmake
+/usr/share/bro/cmake/SetDefaultCompileFlags.cmake
+/usr/share/bro/cmake/SetupRPATH.cmake
+/usr/share/bro/cmake/UserChangedWarning.cmake
+/usr/share/bro/cmake/bro-plugin-create-package.sh
+/usr/share/bro/cmake/bro-plugin-install-package.sh
+/usr/share/bro/cmake/cmake_uninstall.cmake.in
+/usr/share/bro/cmake/package_postupgrade.sh.in
+/usr/share/bro/cmake/package_preinstall.sh.in
+/usr/share/bro/policy/files/x509/log-ocsp.bro
 /usr/share/bro/policy/frameworks/control/controllee.bro
 /usr/share/bro/policy/frameworks/control/controller.bro
 /usr/share/bro/policy/frameworks/dpd/detect-protocols.bro
@@ -565,6 +694,8 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/policy/frameworks/intel/seen/where-locations.bro
 /usr/share/bro/policy/frameworks/intel/seen/x509.bro
 /usr/share/bro/policy/frameworks/intel/whitelist.bro
+/usr/share/bro/policy/frameworks/notice/__load__.bro
+/usr/share/bro/policy/frameworks/notice/extend-email/hostnames.bro
 /usr/share/bro/policy/frameworks/packet-filter/shunt.bro
 /usr/share/bro/policy/frameworks/signatures/detect-windows-shells.sig
 /usr/share/bro/policy/frameworks/software/version-changes.bro
@@ -580,7 +711,6 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/policy/misc/detect-traceroute/detect-low-ttls.sig
 /usr/share/bro/policy/misc/detect-traceroute/main.bro
 /usr/share/bro/policy/misc/dump-events.bro
-/usr/share/bro/policy/misc/known-devices.bro
 /usr/share/bro/policy/misc/load-balancing.bro
 /usr/share/bro/policy/misc/loaded-scripts.bro
 /usr/share/bro/policy/misc/profiling.bro
@@ -593,7 +723,10 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/policy/protocols/conn/mac-logging.bro
 /usr/share/bro/policy/protocols/conn/vlan-logging.bro
 /usr/share/bro/policy/protocols/conn/weirds.bro
-/usr/share/bro/policy/protocols/dhcp/known-devices-and-hostnames.bro
+/usr/share/bro/policy/protocols/dhcp/deprecated_events.bro
+/usr/share/bro/policy/protocols/dhcp/msg-orig.bro
+/usr/share/bro/policy/protocols/dhcp/software.bro
+/usr/share/bro/policy/protocols/dhcp/sub-opts.bro
 /usr/share/bro/policy/protocols/dns/auth-addl.bro
 /usr/share/bro/policy/protocols/dns/detect-external-names.bro
 /usr/share/bro/policy/protocols/ftp/detect-bruteforcing.bro
@@ -613,11 +746,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/policy/protocols/mysql/software.bro
 /usr/share/bro/policy/protocols/rdp/indicate_ssl.bro
 /usr/share/bro/policy/protocols/smb/__load__.bro
-/usr/share/bro/policy/protocols/smb/dpd.sig
-/usr/share/bro/policy/protocols/smb/files.bro
-/usr/share/bro/policy/protocols/smb/main.bro
-/usr/share/bro/policy/protocols/smb/smb1-main.bro
-/usr/share/bro/policy/protocols/smb/smb2-main.bro
+/usr/share/bro/policy/protocols/smb/log-cmds.bro
 /usr/share/bro/policy/protocols/smtp/blocklists.bro
 /usr/share/bro/policy/protocols/smtp/detect-suspicious-orig.bro
 /usr/share/bro/policy/protocols/smtp/entities-excerpt.bro
@@ -634,6 +763,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/policy/protocols/ssl/notary.bro
 /usr/share/bro/policy/protocols/ssl/validate-certs.bro
 /usr/share/bro/policy/protocols/ssl/validate-ocsp.bro
+/usr/share/bro/policy/protocols/ssl/validate-sct.bro
 /usr/share/bro/policy/protocols/ssl/weak-keys.bro
 /usr/share/bro/policy/tuning/__load__.bro
 /usr/share/bro/policy/tuning/defaults/__load__.bro
@@ -642,40 +772,1126 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/policy/tuning/defaults/warnings.bro
 /usr/share/bro/policy/tuning/json-logs.bro
 /usr/share/bro/policy/tuning/track-all-assets.bro
-/usr/share/bro/site/local-logger.bro
-/usr/share/bro/site/local-manager.bro
-/usr/share/bro/site/local-proxy.bro
-/usr/share/bro/site/local-worker.bro
 /usr/share/bro/site/local.bro
 
 %files dev
 %defattr(-,root,root,-)
-/usr/include/*.h
+/usr/include/binpac/binpac.h
+/usr/include/binpac/binpac_analyzer.h
+/usr/include/binpac/binpac_buffer.h
+/usr/include/binpac/binpac_bytestring.h
+/usr/include/binpac/binpac_exception.h
+/usr/include/binpac/binpac_regex.h
+/usr/include/bro/3rdparty/sqlite3.h
+/usr/include/bro/Anon.h
+/usr/include/bro/Attr.h
+/usr/include/bro/Base64.h
+/usr/include/bro/BroList.h
+/usr/include/bro/BroString.h
+/usr/include/bro/Brofiler.h
+/usr/include/bro/CCL.h
+/usr/include/bro/ChunkedIO.h
+/usr/include/bro/CompHash.h
+/usr/include/bro/Conn.h
+/usr/include/bro/Continuation.h
+/usr/include/bro/ConvertUTF.h
+/usr/include/bro/DFA.h
+/usr/include/bro/DNS_Mgr.h
+/usr/include/bro/DbgBreakpoint.h
+/usr/include/bro/DbgDisplay.h
+/usr/include/bro/DbgWatch.h
+/usr/include/bro/Debug.h
+/usr/include/bro/DebugCmdInfoConstants.h
+/usr/include/bro/DebugCmds.h
+/usr/include/bro/DebugLogger.h
+/usr/include/bro/Desc.h
+/usr/include/bro/Dict.h
+/usr/include/bro/Discard.h
+/usr/include/bro/EquivClass.h
+/usr/include/bro/Event.h
+/usr/include/bro/EventHandler.h
+/usr/include/bro/EventLauncher.h
+/usr/include/bro/EventRegistry.h
+/usr/include/bro/Expr.h
+/usr/include/bro/File.h
+/usr/include/bro/Flare.h
+/usr/include/bro/Frag.h
+/usr/include/bro/Frame.h
+/usr/include/bro/Func.h
+/usr/include/bro/Hash.h
+/usr/include/bro/ID.h
+/usr/include/bro/IP.h
+/usr/include/bro/IPAddr.h
+/usr/include/bro/IntSet.h
+/usr/include/bro/List.h
+/usr/include/bro/NFA.h
+/usr/include/bro/Net.h
+/usr/include/bro/NetVar.h
+/usr/include/bro/OSFinger.h
+/usr/include/bro/Obj.h
+/usr/include/bro/Op.h
+/usr/include/bro/OpaqueVal.h
+/usr/include/bro/PacketDumper.h
+/usr/include/bro/PacketFilter.h
+/usr/include/bro/PersistenceSerializer.h
+/usr/include/bro/Pipe.h
+/usr/include/bro/PolicyFile.h
+/usr/include/bro/PrefixTable.h
+/usr/include/bro/PriorityQueue.h
+/usr/include/bro/Queue.h
+/usr/include/bro/RE.h
+/usr/include/bro/RandTest.h
+/usr/include/bro/Reassem.h
+/usr/include/bro/RemoteSerializer.h
+/usr/include/bro/Reporter.h
+/usr/include/bro/Rule.h
+/usr/include/bro/RuleAction.h
+/usr/include/bro/RuleCondition.h
+/usr/include/bro/RuleMatcher.h
+/usr/include/bro/Scope.h
+/usr/include/bro/SerialInfo.h
+/usr/include/bro/SerialObj.h
+/usr/include/bro/SerialTypes.h
+/usr/include/bro/SerializationFormat.h
+/usr/include/bro/Serializer.h
+/usr/include/bro/Sessions.h
+/usr/include/bro/SmithWaterman.h
+/usr/include/bro/StateAccess.h
+/usr/include/bro/Stats.h
+/usr/include/bro/Stmt.h
+/usr/include/bro/StmtEnums.h
+/usr/include/bro/Tag.h
+/usr/include/bro/Timer.h
+/usr/include/bro/Traverse.h
+/usr/include/bro/TraverseTypes.h
+/usr/include/bro/Trigger.h
+/usr/include/bro/TunnelEncapsulation.h
+/usr/include/bro/Type.h
+/usr/include/bro/UID.h
+/usr/include/bro/Val.h
+/usr/include/bro/Var.h
+/usr/include/bro/analyzer/Analyzer.h
+/usr/include/bro/analyzer/Component.h
+/usr/include/bro/analyzer/Manager.h
+/usr/include/bro/analyzer/Tag.h
+/usr/include/bro/analyzer/analyzer.bif.h
+/usr/include/bro/analyzer/protocol/arp/ARP.h
+/usr/include/bro/analyzer/protocol/arp/events.bif.h
+/usr/include/bro/analyzer/protocol/asn1/asn1.pac
+/usr/include/bro/analyzer/protocol/ayiya/AYIYA.h
+/usr/include/bro/analyzer/protocol/ayiya/ayiya-analyzer.pac
+/usr/include/bro/analyzer/protocol/ayiya/ayiya-protocol.pac
+/usr/include/bro/analyzer/protocol/ayiya/ayiya.pac
+/usr/include/bro/analyzer/protocol/backdoor/BackDoor.h
+/usr/include/bro/analyzer/protocol/backdoor/events.bif.h
+/usr/include/bro/analyzer/protocol/bittorrent/BitTorrent.h
+/usr/include/bro/analyzer/protocol/bittorrent/BitTorrentTracker.h
+/usr/include/bro/analyzer/protocol/bittorrent/bittorrent-analyzer.pac
+/usr/include/bro/analyzer/protocol/bittorrent/bittorrent-protocol.pac
+/usr/include/bro/analyzer/protocol/bittorrent/bittorrent.pac
+/usr/include/bro/analyzer/protocol/bittorrent/events.bif.h
+/usr/include/bro/analyzer/protocol/conn-size/ConnSize.h
+/usr/include/bro/analyzer/protocol/conn-size/events.bif.h
+/usr/include/bro/analyzer/protocol/conn-size/functions.bif.h
+/usr/include/bro/analyzer/protocol/dce-rpc/DCE_RPC.h
+/usr/include/bro/analyzer/protocol/dce-rpc/consts.bif.h
+/usr/include/bro/analyzer/protocol/dce-rpc/dce_rpc-analyzer.pac
+/usr/include/bro/analyzer/protocol/dce-rpc/dce_rpc-auth.pac
+/usr/include/bro/analyzer/protocol/dce-rpc/dce_rpc-protocol.pac
+/usr/include/bro/analyzer/protocol/dce-rpc/dce_rpc.pac
+/usr/include/bro/analyzer/protocol/dce-rpc/endpoint-atsvc.pac
+/usr/include/bro/analyzer/protocol/dce-rpc/endpoint-epmapper.pac
+/usr/include/bro/analyzer/protocol/dce-rpc/events.bif.h
+/usr/include/bro/analyzer/protocol/dce-rpc/types.bif.h
+/usr/include/bro/analyzer/protocol/dhcp/DHCP.h
+/usr/include/bro/analyzer/protocol/dhcp/dhcp-analyzer.pac
+/usr/include/bro/analyzer/protocol/dhcp/dhcp-options.pac
+/usr/include/bro/analyzer/protocol/dhcp/dhcp-protocol.pac
+/usr/include/bro/analyzer/protocol/dhcp/dhcp.pac
+/usr/include/bro/analyzer/protocol/dhcp/events.bif.h
+/usr/include/bro/analyzer/protocol/dhcp/types.bif.h
+/usr/include/bro/analyzer/protocol/dnp3/DNP3.h
+/usr/include/bro/analyzer/protocol/dnp3/dnp3-analyzer.pac
+/usr/include/bro/analyzer/protocol/dnp3/dnp3-objects.pac
+/usr/include/bro/analyzer/protocol/dnp3/dnp3-protocol.pac
+/usr/include/bro/analyzer/protocol/dnp3/dnp3.pac
+/usr/include/bro/analyzer/protocol/dnp3/events.bif.h
+/usr/include/bro/analyzer/protocol/dns/DNS.h
+/usr/include/bro/analyzer/protocol/dns/events.bif.h
+/usr/include/bro/analyzer/protocol/file/File.h
+/usr/include/bro/analyzer/protocol/file/events.bif.h
+/usr/include/bro/analyzer/protocol/finger/Finger.h
+/usr/include/bro/analyzer/protocol/finger/events.bif.h
+/usr/include/bro/analyzer/protocol/ftp/FTP.h
+/usr/include/bro/analyzer/protocol/ftp/events.bif.h
+/usr/include/bro/analyzer/protocol/ftp/functions.bif.h
+/usr/include/bro/analyzer/protocol/gnutella/Gnutella.h
+/usr/include/bro/analyzer/protocol/gnutella/events.bif.h
+/usr/include/bro/analyzer/protocol/gssapi/GSSAPI.h
+/usr/include/bro/analyzer/protocol/gssapi/events.bif.h
+/usr/include/bro/analyzer/protocol/gssapi/gssapi-analyzer.pac
+/usr/include/bro/analyzer/protocol/gssapi/gssapi-protocol.pac
+/usr/include/bro/analyzer/protocol/gssapi/gssapi.pac
+/usr/include/bro/analyzer/protocol/gtpv1/GTPv1.h
+/usr/include/bro/analyzer/protocol/gtpv1/events.bif.h
+/usr/include/bro/analyzer/protocol/gtpv1/gtpv1-analyzer.pac
+/usr/include/bro/analyzer/protocol/gtpv1/gtpv1-protocol.pac
+/usr/include/bro/analyzer/protocol/gtpv1/gtpv1.pac
+/usr/include/bro/analyzer/protocol/http/HTTP.h
+/usr/include/bro/analyzer/protocol/http/events.bif.h
+/usr/include/bro/analyzer/protocol/http/functions.bif.h
+/usr/include/bro/analyzer/protocol/icmp/ICMP.h
+/usr/include/bro/analyzer/protocol/icmp/events.bif.h
+/usr/include/bro/analyzer/protocol/ident/Ident.h
+/usr/include/bro/analyzer/protocol/ident/events.bif.h
+/usr/include/bro/analyzer/protocol/imap/IMAP.h
+/usr/include/bro/analyzer/protocol/imap/events.bif.h
+/usr/include/bro/analyzer/protocol/imap/imap-analyzer.pac
+/usr/include/bro/analyzer/protocol/imap/imap-protocol.pac
+/usr/include/bro/analyzer/protocol/imap/imap.pac
+/usr/include/bro/analyzer/protocol/interconn/InterConn.h
+/usr/include/bro/analyzer/protocol/interconn/events.bif.h
+/usr/include/bro/analyzer/protocol/irc/IRC.h
+/usr/include/bro/analyzer/protocol/irc/events.bif.h
+/usr/include/bro/analyzer/protocol/krb/KRB.h
+/usr/include/bro/analyzer/protocol/krb/KRB_TCP.h
+/usr/include/bro/analyzer/protocol/krb/events.bif.h
+/usr/include/bro/analyzer/protocol/krb/krb-analyzer.pac
+/usr/include/bro/analyzer/protocol/krb/krb-asn1.pac
+/usr/include/bro/analyzer/protocol/krb/krb-defs.pac
+/usr/include/bro/analyzer/protocol/krb/krb-padata.pac
+/usr/include/bro/analyzer/protocol/krb/krb-protocol.pac
+/usr/include/bro/analyzer/protocol/krb/krb-types.pac
+/usr/include/bro/analyzer/protocol/krb/krb.pac
+/usr/include/bro/analyzer/protocol/krb/krb_TCP.pac
+/usr/include/bro/analyzer/protocol/krb/types.bif.h
+/usr/include/bro/analyzer/protocol/login/Login.h
+/usr/include/bro/analyzer/protocol/login/NVT.h
+/usr/include/bro/analyzer/protocol/login/RSH.h
+/usr/include/bro/analyzer/protocol/login/Rlogin.h
+/usr/include/bro/analyzer/protocol/login/Telnet.h
+/usr/include/bro/analyzer/protocol/login/events.bif.h
+/usr/include/bro/analyzer/protocol/login/functions.bif.h
+/usr/include/bro/analyzer/protocol/mime/MIME.h
+/usr/include/bro/analyzer/protocol/mime/events.bif.h
+/usr/include/bro/analyzer/protocol/modbus/Modbus.h
+/usr/include/bro/analyzer/protocol/modbus/events.bif.h
+/usr/include/bro/analyzer/protocol/modbus/modbus-analyzer.pac
+/usr/include/bro/analyzer/protocol/modbus/modbus-protocol.pac
+/usr/include/bro/analyzer/protocol/modbus/modbus.pac
+/usr/include/bro/analyzer/protocol/mysql/MySQL.h
+/usr/include/bro/analyzer/protocol/mysql/events.bif.h
+/usr/include/bro/analyzer/protocol/mysql/mysql-analyzer.pac
+/usr/include/bro/analyzer/protocol/mysql/mysql-protocol.pac
+/usr/include/bro/analyzer/protocol/mysql/mysql.pac
+/usr/include/bro/analyzer/protocol/ncp/NCP.h
+/usr/include/bro/analyzer/protocol/ncp/consts.bif.h
+/usr/include/bro/analyzer/protocol/ncp/events.bif.h
+/usr/include/bro/analyzer/protocol/ncp/ncp.pac
+/usr/include/bro/analyzer/protocol/netbios/NetbiosSSN.h
+/usr/include/bro/analyzer/protocol/netbios/events.bif.h
+/usr/include/bro/analyzer/protocol/netbios/functions.bif.h
+/usr/include/bro/analyzer/protocol/ntlm/NTLM.h
+/usr/include/bro/analyzer/protocol/ntlm/events.bif.h
+/usr/include/bro/analyzer/protocol/ntlm/ntlm-analyzer.pac
+/usr/include/bro/analyzer/protocol/ntlm/ntlm-protocol.pac
+/usr/include/bro/analyzer/protocol/ntlm/ntlm.pac
+/usr/include/bro/analyzer/protocol/ntlm/types.bif.h
+/usr/include/bro/analyzer/protocol/ntp/NTP.h
+/usr/include/bro/analyzer/protocol/ntp/events.bif.h
+/usr/include/bro/analyzer/protocol/pia/PIA.h
+/usr/include/bro/analyzer/protocol/pop3/POP3.h
+/usr/include/bro/analyzer/protocol/pop3/events.bif.h
+/usr/include/bro/analyzer/protocol/radius/RADIUS.h
+/usr/include/bro/analyzer/protocol/radius/events.bif.h
+/usr/include/bro/analyzer/protocol/radius/radius-analyzer.pac
+/usr/include/bro/analyzer/protocol/radius/radius-protocol.pac
+/usr/include/bro/analyzer/protocol/radius/radius.pac
+/usr/include/bro/analyzer/protocol/rdp/RDP.h
+/usr/include/bro/analyzer/protocol/rdp/events.bif.h
+/usr/include/bro/analyzer/protocol/rdp/rdp-analyzer.pac
+/usr/include/bro/analyzer/protocol/rdp/rdp-protocol.pac
+/usr/include/bro/analyzer/protocol/rdp/rdp.pac
+/usr/include/bro/analyzer/protocol/rdp/types.bif.h
+/usr/include/bro/analyzer/protocol/rfb/RFB.h
+/usr/include/bro/analyzer/protocol/rfb/events.bif.h
+/usr/include/bro/analyzer/protocol/rfb/rfb-analyzer.pac
+/usr/include/bro/analyzer/protocol/rfb/rfb-protocol.pac
+/usr/include/bro/analyzer/protocol/rfb/rfb.pac
+/usr/include/bro/analyzer/protocol/rpc/MOUNT.h
+/usr/include/bro/analyzer/protocol/rpc/NFS.h
+/usr/include/bro/analyzer/protocol/rpc/Portmap.h
+/usr/include/bro/analyzer/protocol/rpc/RPC.h
+/usr/include/bro/analyzer/protocol/rpc/XDR.h
+/usr/include/bro/analyzer/protocol/rpc/events.bif.h
+/usr/include/bro/analyzer/protocol/sip/SIP.h
+/usr/include/bro/analyzer/protocol/sip/SIP_TCP.h
+/usr/include/bro/analyzer/protocol/sip/events.bif.h
+/usr/include/bro/analyzer/protocol/sip/sip-analyzer.pac
+/usr/include/bro/analyzer/protocol/sip/sip-protocol.pac
+/usr/include/bro/analyzer/protocol/sip/sip.pac
+/usr/include/bro/analyzer/protocol/sip/sip_TCP.pac
+/usr/include/bro/analyzer/protocol/smb/SMB.h
+/usr/include/bro/analyzer/protocol/smb/consts.bif.h
+/usr/include/bro/analyzer/protocol/smb/events.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb-common.pac
+/usr/include/bro/analyzer/protocol/smb/smb-gssapi.pac
+/usr/include/bro/analyzer/protocol/smb/smb-mailslot.pac
+/usr/include/bro/analyzer/protocol/smb/smb-pipe.pac
+/usr/include/bro/analyzer/protocol/smb/smb-strings.pac
+/usr/include/bro/analyzer/protocol/smb/smb-time.pac
+/usr/include/bro/analyzer/protocol/smb/smb.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-check-directory.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-close.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-create-directory.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-echo.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-locking-andx.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-logoff-andx.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-negotiate.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-nt-cancel.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-nt-create-andx.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-nt-transact.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-query-information.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-read-andx.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-session-setup-andx.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-transaction-secondary.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-transaction.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-transaction2-secondary.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-transaction2.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-tree-connect-andx.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-tree-disconnect.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-com-write-andx.pac
+/usr/include/bro/analyzer/protocol/smb/smb1-protocol.pac
+/usr/include/bro/analyzer/protocol/smb/smb1_com_check_directory.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_close.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_create_directory.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_echo.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_logoff_andx.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_negotiate.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_nt_cancel.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_nt_create_andx.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_query_information.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_read_andx.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_session_setup_andx.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_transaction.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_transaction2.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_transaction2_secondary.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_transaction_secondary.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_tree_connect_andx.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_tree_disconnect.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_com_write_andx.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb1_events.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2-com-close.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-create.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-ioctl.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-lock.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-negotiate.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-read.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-session-setup.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-set-info.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-tree-connect.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-tree-disconnect.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-com-write.pac
+/usr/include/bro/analyzer/protocol/smb/smb2-protocol.pac
+/usr/include/bro/analyzer/protocol/smb/smb2_com_close.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2_com_create.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2_com_negotiate.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2_com_read.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2_com_session_setup.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2_com_set_info.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2_com_tree_connect.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2_com_tree_disconnect.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2_com_write.bif.h
+/usr/include/bro/analyzer/protocol/smb/smb2_events.bif.h
+/usr/include/bro/analyzer/protocol/smb/types.bif.h
+/usr/include/bro/analyzer/protocol/smtp/SMTP.h
+/usr/include/bro/analyzer/protocol/smtp/events.bif.h
+/usr/include/bro/analyzer/protocol/smtp/functions.bif.h
+/usr/include/bro/analyzer/protocol/snmp/SNMP.h
+/usr/include/bro/analyzer/protocol/snmp/events.bif.h
+/usr/include/bro/analyzer/protocol/snmp/snmp-analyzer.pac
+/usr/include/bro/analyzer/protocol/snmp/snmp-protocol.pac
+/usr/include/bro/analyzer/protocol/snmp/snmp.pac
+/usr/include/bro/analyzer/protocol/snmp/types.bif.h
+/usr/include/bro/analyzer/protocol/socks/SOCKS.h
+/usr/include/bro/analyzer/protocol/socks/events.bif.h
+/usr/include/bro/analyzer/protocol/socks/socks-analyzer.pac
+/usr/include/bro/analyzer/protocol/socks/socks-protocol.pac
+/usr/include/bro/analyzer/protocol/socks/socks.pac
+/usr/include/bro/analyzer/protocol/ssh/SSH.h
+/usr/include/bro/analyzer/protocol/ssh/consts.pac
+/usr/include/bro/analyzer/protocol/ssh/events.bif.h
+/usr/include/bro/analyzer/protocol/ssh/ssh-analyzer.pac
+/usr/include/bro/analyzer/protocol/ssh/ssh-protocol.pac
+/usr/include/bro/analyzer/protocol/ssh/ssh.pac
+/usr/include/bro/analyzer/protocol/ssh/types.bif.h
+/usr/include/bro/analyzer/protocol/ssl/DTLS.h
+/usr/include/bro/analyzer/protocol/ssl/SSL.h
+/usr/include/bro/analyzer/protocol/ssl/dtls-analyzer.pac
+/usr/include/bro/analyzer/protocol/ssl/dtls-protocol.pac
+/usr/include/bro/analyzer/protocol/ssl/dtls.pac
+/usr/include/bro/analyzer/protocol/ssl/events.bif.h
+/usr/include/bro/analyzer/protocol/ssl/functions.bif.h
+/usr/include/bro/analyzer/protocol/ssl/proc-certificate.pac
+/usr/include/bro/analyzer/protocol/ssl/proc-client-hello.pac
+/usr/include/bro/analyzer/protocol/ssl/proc-server-hello.pac
+/usr/include/bro/analyzer/protocol/ssl/ssl-analyzer.pac
+/usr/include/bro/analyzer/protocol/ssl/ssl-defs.pac
+/usr/include/bro/analyzer/protocol/ssl/ssl-dtls-analyzer.pac
+/usr/include/bro/analyzer/protocol/ssl/ssl-dtls-protocol.pac
+/usr/include/bro/analyzer/protocol/ssl/ssl-protocol.pac
+/usr/include/bro/analyzer/protocol/ssl/ssl.pac
+/usr/include/bro/analyzer/protocol/ssl/tls-handshake-analyzer.pac
+/usr/include/bro/analyzer/protocol/ssl/tls-handshake-protocol.pac
+/usr/include/bro/analyzer/protocol/ssl/tls-handshake-signed_certificate_timestamp.pac
+/usr/include/bro/analyzer/protocol/ssl/tls-handshake.pac
+/usr/include/bro/analyzer/protocol/ssl/types.bif.h
+/usr/include/bro/analyzer/protocol/stepping-stone/SteppingStone.h
+/usr/include/bro/analyzer/protocol/stepping-stone/events.bif.h
+/usr/include/bro/analyzer/protocol/syslog/Syslog.h
+/usr/include/bro/analyzer/protocol/syslog/events.bif.h
+/usr/include/bro/analyzer/protocol/syslog/syslog-analyzer.pac
+/usr/include/bro/analyzer/protocol/syslog/syslog-protocol.pac
+/usr/include/bro/analyzer/protocol/syslog/syslog.pac
+/usr/include/bro/analyzer/protocol/tcp/ContentLine.h
+/usr/include/bro/analyzer/protocol/tcp/Stats.h
+/usr/include/bro/analyzer/protocol/tcp/TCP.h
+/usr/include/bro/analyzer/protocol/tcp/TCP_Endpoint.h
+/usr/include/bro/analyzer/protocol/tcp/TCP_Flags.h
+/usr/include/bro/analyzer/protocol/tcp/TCP_Reassembler.h
+/usr/include/bro/analyzer/protocol/tcp/events.bif.h
+/usr/include/bro/analyzer/protocol/tcp/functions.bif.h
+/usr/include/bro/analyzer/protocol/teredo/Teredo.h
+/usr/include/bro/analyzer/protocol/teredo/events.bif.h
+/usr/include/bro/analyzer/protocol/udp/UDP.h
+/usr/include/bro/analyzer/protocol/udp/events.bif.h
+/usr/include/bro/analyzer/protocol/xmpp/XMPP.h
+/usr/include/bro/analyzer/protocol/xmpp/events.bif.h
+/usr/include/bro/analyzer/protocol/xmpp/xmpp-analyzer.pac
+/usr/include/bro/analyzer/protocol/xmpp/xmpp-protocol.pac
+/usr/include/bro/analyzer/protocol/xmpp/xmpp.pac
+/usr/include/bro/analyzer/protocol/zip/ZIP.h
+/usr/include/bro/binpac-lib.pac
+/usr/include/bro/binpac.pac
+/usr/include/bro/binpac_bro-lib.pac
+/usr/include/bro/binpac_bro.h
+/usr/include/bro/bro-bif.h
+/usr/include/bro/bro-config.h
+/usr/include/bro/bro.bif.func_h
+/usr/include/bro/bro.bif.netvar_h
+/usr/include/bro/bro.pac
+/usr/include/bro/bro_inet_ntop.h
+/usr/include/bro/broker/Data.h
+/usr/include/bro/broker/Manager.h
+/usr/include/bro/broker/Store.h
+/usr/include/bro/broker/comm.bif.h
+/usr/include/bro/broker/data.bif.h
+/usr/include/bro/broker/messaging.bif.h
+/usr/include/bro/broker/store.bif.h
+/usr/include/bro/broxygen/Configuration.h
+/usr/include/bro/broxygen/IdentifierInfo.h
+/usr/include/bro/broxygen/Info.h
+/usr/include/bro/broxygen/Manager.h
+/usr/include/bro/broxygen/PackageInfo.h
+/usr/include/bro/broxygen/ReStructuredTextTable.h
+/usr/include/bro/broxygen/ScriptInfo.h
+/usr/include/bro/broxygen/Target.h
+/usr/include/bro/broxygen/broxygen.bif.h
+/usr/include/bro/broxygen/utils.h
+/usr/include/bro/bsd-getopt-long.h
+/usr/include/bro/const.bif.func_h
+/usr/include/bro/const.bif.netvar_h
+/usr/include/bro/cq.h
+/usr/include/bro/digest.h
+/usr/include/bro/event.bif.func_h
+/usr/include/bro/event.bif.netvar_h
+/usr/include/bro/file_analysis/Analyzer.h
+/usr/include/bro/file_analysis/AnalyzerSet.h
+/usr/include/bro/file_analysis/Component.h
+/usr/include/bro/file_analysis/File.h
+/usr/include/bro/file_analysis/FileReassembler.h
+/usr/include/bro/file_analysis/FileTimer.h
+/usr/include/bro/file_analysis/Manager.h
+/usr/include/bro/file_analysis/Tag.h
+/usr/include/bro/file_analysis/analyzer/data_event/DataEvent.h
+/usr/include/bro/file_analysis/analyzer/entropy/Entropy.h
+/usr/include/bro/file_analysis/analyzer/entropy/events.bif.h
+/usr/include/bro/file_analysis/analyzer/extract/Extract.h
+/usr/include/bro/file_analysis/analyzer/extract/events.bif.h
+/usr/include/bro/file_analysis/analyzer/extract/functions.bif.h
+/usr/include/bro/file_analysis/analyzer/hash/Hash.h
+/usr/include/bro/file_analysis/analyzer/hash/events.bif.h
+/usr/include/bro/file_analysis/analyzer/pe/PE.h
+/usr/include/bro/file_analysis/analyzer/pe/events.bif.h
+/usr/include/bro/file_analysis/analyzer/pe/pe-analyzer.pac
+/usr/include/bro/file_analysis/analyzer/pe/pe-file-headers.pac
+/usr/include/bro/file_analysis/analyzer/pe/pe-file-idata.pac
+/usr/include/bro/file_analysis/analyzer/pe/pe-file-types.pac
+/usr/include/bro/file_analysis/analyzer/pe/pe-file.pac
+/usr/include/bro/file_analysis/analyzer/pe/pe.pac
+/usr/include/bro/file_analysis/analyzer/unified2/Unified2.h
+/usr/include/bro/file_analysis/analyzer/unified2/events.bif.h
+/usr/include/bro/file_analysis/analyzer/unified2/types.bif.h
+/usr/include/bro/file_analysis/analyzer/unified2/unified2-analyzer.pac
+/usr/include/bro/file_analysis/analyzer/unified2/unified2-file.pac
+/usr/include/bro/file_analysis/analyzer/unified2/unified2.pac
+/usr/include/bro/file_analysis/analyzer/x509/OCSP.h
+/usr/include/bro/file_analysis/analyzer/x509/X509.h
+/usr/include/bro/file_analysis/analyzer/x509/X509Common.h
+/usr/include/bro/file_analysis/analyzer/x509/events.bif.h
+/usr/include/bro/file_analysis/analyzer/x509/functions.bif.h
+/usr/include/bro/file_analysis/analyzer/x509/ocsp_events.bif.h
+/usr/include/bro/file_analysis/analyzer/x509/types.bif.h
+/usr/include/bro/file_analysis/analyzer/x509/x509-extension.pac
+/usr/include/bro/file_analysis/analyzer/x509/x509-signed_certificate_timestamp.pac
+/usr/include/bro/file_analysis/file_analysis.bif.h
+/usr/include/bro/input.h
+/usr/include/bro/input/Component.h
+/usr/include/bro/input/Manager.h
+/usr/include/bro/input/ReaderBackend.h
+/usr/include/bro/input/ReaderFrontend.h
+/usr/include/bro/input/Tag.h
+/usr/include/bro/input/input.bif.h
+/usr/include/bro/input/readers/ascii/Ascii.h
+/usr/include/bro/input/readers/ascii/ascii.bif.h
+/usr/include/bro/input/readers/benchmark/Benchmark.h
+/usr/include/bro/input/readers/benchmark/benchmark.bif.h
+/usr/include/bro/input/readers/binary/Binary.h
+/usr/include/bro/input/readers/binary/binary.bif.h
+/usr/include/bro/input/readers/config/Config.h
+/usr/include/bro/input/readers/config/config.bif.h
+/usr/include/bro/input/readers/raw/Plugin.h
+/usr/include/bro/input/readers/raw/Raw.h
+/usr/include/bro/input/readers/raw/raw.bif.h
+/usr/include/bro/input/readers/sqlite/SQLite.h
+/usr/include/bro/input/readers/sqlite/sqlite.bif.h
+/usr/include/bro/iosource/BPF_Program.h
+/usr/include/bro/iosource/Component.h
+/usr/include/bro/iosource/FD_Set.h
+/usr/include/bro/iosource/IOSource.h
+/usr/include/bro/iosource/Manager.h
+/usr/include/bro/iosource/Packet.h
+/usr/include/bro/iosource/PktDumper.h
+/usr/include/bro/iosource/PktSrc.h
+/usr/include/bro/iosource/pcap/Dumper.h
+/usr/include/bro/iosource/pcap/Source.h
+/usr/include/bro/iosource/pcap/pcap.bif.h
+/usr/include/bro/logging/Component.h
+/usr/include/bro/logging/Manager.h
+/usr/include/bro/logging/Tag.h
+/usr/include/bro/logging/WriterBackend.h
+/usr/include/bro/logging/WriterFrontend.h
+/usr/include/bro/logging/logging.bif.h
+/usr/include/bro/logging/writers/ascii/Ascii.h
+/usr/include/bro/logging/writers/ascii/ascii.bif.h
+/usr/include/bro/logging/writers/none/None.h
+/usr/include/bro/logging/writers/none/none.bif.h
+/usr/include/bro/logging/writers/sqlite/SQLite.h
+/usr/include/bro/logging/writers/sqlite/sqlite.bif.h
+/usr/include/bro/modp_numtoa.h
+/usr/include/bro/module_util.h
+/usr/include/bro/nb_dns.h
+/usr/include/bro/net_util.h
+/usr/include/bro/option.bif.func_h
+/usr/include/bro/option.bif.netvar_h
+/usr/include/bro/patricia.h
+/usr/include/bro/plugin/Component.h
+/usr/include/bro/plugin/ComponentManager.h
+/usr/include/bro/plugin/Manager.h
+/usr/include/bro/plugin/Plugin.h
+/usr/include/bro/plugin/TaggedComponent.h
+/usr/include/bro/probabilistic/BitVector.h
+/usr/include/bro/probabilistic/BloomFilter.h
+/usr/include/bro/probabilistic/CardinalityCounter.h
+/usr/include/bro/probabilistic/CounterVector.h
+/usr/include/bro/probabilistic/Hasher.h
+/usr/include/bro/probabilistic/Topk.h
+/usr/include/bro/probabilistic/bloom-filter.bif.h
+/usr/include/bro/probabilistic/cardinality-counter.bif.h
+/usr/include/bro/probabilistic/top-k.bif.h
+/usr/include/bro/reporter.bif.func_h
+/usr/include/bro/reporter.bif.netvar_h
+/usr/include/bro/setsignal.h
+/usr/include/bro/siphash24.h
+/usr/include/bro/stats.bif.func_h
+/usr/include/bro/stats.bif.netvar_h
+/usr/include/bro/strings.bif.func_h
+/usr/include/bro/strings.bif.netvar_h
+/usr/include/bro/threading/BasicThread.h
+/usr/include/bro/threading/Formatter.h
+/usr/include/bro/threading/Manager.h
+/usr/include/bro/threading/MsgThread.h
+/usr/include/bro/threading/Queue.h
+/usr/include/bro/threading/SerialTypes.h
+/usr/include/bro/threading/formatters/Ascii.h
+/usr/include/bro/threading/formatters/JSON.h
+/usr/include/bro/types.bif.func_h
+/usr/include/bro/types.bif.netvar_h
+/usr/include/bro/util.h
+/usr/include/broker/address.hh
+/usr/include/broker/api_flags.hh
+/usr/include/broker/atoms.hh
+/usr/include/broker/backend.hh
+/usr/include/broker/backend_options.hh
+/usr/include/broker/bad_variant_access.hh
+/usr/include/broker/bro.hh
+/usr/include/broker/broker.hh
+/usr/include/broker/config.hh
+/usr/include/broker/configuration.hh
+/usr/include/broker/convert.hh
+/usr/include/broker/core_actor.hh
+/usr/include/broker/data.hh
+/usr/include/broker/detail/abstract_backend.hh
+/usr/include/broker/detail/appliers.hh
+/usr/include/broker/detail/assert.hh
+/usr/include/broker/detail/blob.hh
+/usr/include/broker/detail/clone_actor.hh
+/usr/include/broker/detail/core_policy.hh
+/usr/include/broker/detail/core_scatterer.hh
+/usr/include/broker/detail/die.hh
+/usr/include/broker/detail/filesystem.hh
+/usr/include/broker/detail/flare.hh
+/usr/include/broker/detail/flare_actor.hh
+/usr/include/broker/detail/hash.hh
+/usr/include/broker/detail/make_backend.hh
+/usr/include/broker/detail/make_unique.hh
+/usr/include/broker/detail/master_actor.hh
+/usr/include/broker/detail/master_resolver.hh
+/usr/include/broker/detail/memory_backend.hh
+/usr/include/broker/detail/network_cache.hh
+/usr/include/broker/detail/operators.hh
+/usr/include/broker/detail/prefix_matcher.hh
+/usr/include/broker/detail/radix_tree.hh
+/usr/include/broker/detail/rocksdb_backend.hh
+/usr/include/broker/detail/scoped_flare_actor.hh
+/usr/include/broker/detail/shared_publisher_queue.hh
+/usr/include/broker/detail/shared_queue.hh
+/usr/include/broker/detail/shared_subscriber_queue.hh
+/usr/include/broker/detail/sqlite_backend.hh
+/usr/include/broker/detail/subscription.hh
+/usr/include/broker/detail/type_traits.hh
+/usr/include/broker/endpoint.hh
+/usr/include/broker/endpoint_info.hh
+/usr/include/broker/enum_value.hh
+/usr/include/broker/error.hh
+/usr/include/broker/expected.hh
+/usr/include/broker/filter_type.hh
+/usr/include/broker/frontend.hh
+/usr/include/broker/fwd.hh
+/usr/include/broker/internal_command.hh
+/usr/include/broker/logger.hh
+/usr/include/broker/mailbox.hh
+/usr/include/broker/network_info.hh
+/usr/include/broker/none.hh
+/usr/include/broker/optional.hh
+/usr/include/broker/peer_filter.hh
+/usr/include/broker/peer_flags.hh
+/usr/include/broker/peer_info.hh
+/usr/include/broker/peer_status.hh
+/usr/include/broker/port.hh
+/usr/include/broker/publisher.hh
+/usr/include/broker/snapshot.hh
+/usr/include/broker/status.hh
+/usr/include/broker/status_subscriber.hh
+/usr/include/broker/store.hh
+/usr/include/broker/subnet.hh
+/usr/include/broker/subscriber.hh
+/usr/include/broker/subscriber_base.hh
+/usr/include/broker/time.hh
+/usr/include/broker/timeout.hh
+/usr/include/broker/topic.hh
+/usr/include/broker/version.hh
+/usr/include/caf/abstract_actor.hpp
+/usr/include/caf/abstract_channel.hpp
+/usr/include/caf/abstract_composable_behavior.hpp
+/usr/include/caf/abstract_group.hpp
+/usr/include/caf/actor.hpp
+/usr/include/caf/actor_addr.hpp
+/usr/include/caf/actor_cast.hpp
+/usr/include/caf/actor_clock.hpp
+/usr/include/caf/actor_companion.hpp
+/usr/include/caf/actor_config.hpp
+/usr/include/caf/actor_control_block.hpp
+/usr/include/caf/actor_factory.hpp
+/usr/include/caf/actor_marker.hpp
+/usr/include/caf/actor_ostream.hpp
+/usr/include/caf/actor_pool.hpp
+/usr/include/caf/actor_proxy.hpp
+/usr/include/caf/actor_registry.hpp
+/usr/include/caf/actor_storage.hpp
+/usr/include/caf/actor_system.hpp
+/usr/include/caf/actor_system_config.hpp
+/usr/include/caf/after.hpp
+/usr/include/caf/all.hpp
+/usr/include/caf/allowed_unsafe_message_type.hpp
+/usr/include/caf/atom.hpp
+/usr/include/caf/attachable.hpp
+/usr/include/caf/behavior.hpp
+/usr/include/caf/behavior_policy.hpp
+/usr/include/caf/binary_deserializer.hpp
+/usr/include/caf/binary_serializer.hpp
+/usr/include/caf/blocking_actor.hpp
+/usr/include/caf/broadcast_downstream_manager.hpp
+/usr/include/caf/buffered_downstream_manager.hpp
+/usr/include/caf/byte_address.hpp
+/usr/include/caf/callback.hpp
+/usr/include/caf/catch_all.hpp
+/usr/include/caf/check_typed_input.hpp
+/usr/include/caf/composable_behavior.hpp
+/usr/include/caf/composable_behavior_based_actor.hpp
+/usr/include/caf/composed_behavior.hpp
+/usr/include/caf/composed_type.hpp
+/usr/include/caf/config.hpp
+/usr/include/caf/config_option.hpp
+/usr/include/caf/config_option_adder.hpp
+/usr/include/caf/config_option_set.hpp
+/usr/include/caf/config_value.hpp
+/usr/include/caf/data_processor.hpp
+/usr/include/caf/decorator/sequencer.hpp
+/usr/include/caf/decorator/splitter.hpp
+/usr/include/caf/deduce_mpi.hpp
+/usr/include/caf/deep_to_string.hpp
+/usr/include/caf/default_attachable.hpp
+/usr/include/caf/default_downstream_manager.hpp
+/usr/include/caf/default_sum_type_access.hpp
+/usr/include/caf/defaults.hpp
+/usr/include/caf/delegated.hpp
+/usr/include/caf/deserializer.hpp
+/usr/include/caf/detail/algorithms.hpp
+/usr/include/caf/detail/append_hex.hpp
+/usr/include/caf/detail/apply_args.hpp
+/usr/include/caf/detail/arg_match_t.hpp
+/usr/include/caf/detail/arg_wrapper.hpp
+/usr/include/caf/detail/atom_val.hpp
+/usr/include/caf/detail/behavior_impl.hpp
+/usr/include/caf/detail/behavior_stack.hpp
+/usr/include/caf/detail/blocking_behavior.hpp
+/usr/include/caf/detail/bounds_checker.hpp
+/usr/include/caf/detail/build_config.hpp
+/usr/include/caf/detail/call_cfun.hpp
+/usr/include/caf/detail/cas_weak.hpp
+/usr/include/caf/detail/comparable.hpp
+/usr/include/caf/detail/concatenated_tuple.hpp
+/usr/include/caf/detail/decorated_tuple.hpp
+/usr/include/caf/detail/default_invoke_result_visitor.hpp
+/usr/include/caf/detail/delegate_serialize.hpp
+/usr/include/caf/detail/disposer.hpp
+/usr/include/caf/detail/double_ended_queue.hpp
+/usr/include/caf/detail/dynamic_message_data.hpp
+/usr/include/caf/detail/embedded.hpp
+/usr/include/caf/detail/enqueue_result.hpp
+/usr/include/caf/detail/enum_to_string.hpp
+/usr/include/caf/detail/functor_attachable.hpp
+/usr/include/caf/detail/gcd.hpp
+/usr/include/caf/detail/get_mac_addresses.hpp
+/usr/include/caf/detail/get_process_id.hpp
+/usr/include/caf/detail/get_root_uuid.hpp
+/usr/include/caf/detail/ieee_754.hpp
+/usr/include/caf/detail/implicit_conversions.hpp
+/usr/include/caf/detail/ini_consumer.hpp
+/usr/include/caf/detail/init_fun_factory.hpp
+/usr/include/caf/detail/int_list.hpp
+/usr/include/caf/detail/invoke_result_visitor.hpp
+/usr/include/caf/detail/is_one_of.hpp
+/usr/include/caf/detail/is_primitive_config_value.hpp
+/usr/include/caf/detail/limited_vector.hpp
+/usr/include/caf/detail/mask_bits.hpp
+/usr/include/caf/detail/merged_tuple.hpp
+/usr/include/caf/detail/message_data.hpp
+/usr/include/caf/detail/move_if_not_ptr.hpp
+/usr/include/caf/detail/mpi_splice.hpp
+/usr/include/caf/detail/network_order.hpp
+/usr/include/caf/detail/optional_message_visitor.hpp
+/usr/include/caf/detail/overload.hpp
+/usr/include/caf/detail/parser/add_ascii.hpp
+/usr/include/caf/detail/parser/ascii_to_int.hpp
+/usr/include/caf/detail/parser/chars.hpp
+/usr/include/caf/detail/parser/fsm.hpp
+/usr/include/caf/detail/parser/fsm_undef.hpp
+/usr/include/caf/detail/parser/is_char.hpp
+/usr/include/caf/detail/parser/is_digit.hpp
+/usr/include/caf/detail/parser/read_atom.hpp
+/usr/include/caf/detail/parser/read_bool.hpp
+/usr/include/caf/detail/parser/read_ini.hpp
+/usr/include/caf/detail/parser/read_ipv4_address.hpp
+/usr/include/caf/detail/parser/read_ipv6_address.hpp
+/usr/include/caf/detail/parser/read_number.hpp
+/usr/include/caf/detail/parser/read_number_or_timespan.hpp
+/usr/include/caf/detail/parser/read_string.hpp
+/usr/include/caf/detail/parser/read_uri.hpp
+/usr/include/caf/detail/parser/state.hpp
+/usr/include/caf/detail/parser/sub_ascii.hpp
+/usr/include/caf/detail/path_state.hpp
+/usr/include/caf/detail/pp.hpp
+/usr/include/caf/detail/pretty_type_name.hpp
+/usr/include/caf/detail/private_thread.hpp
+/usr/include/caf/detail/pseudo_tuple.hpp
+/usr/include/caf/detail/raw_access.hpp
+/usr/include/caf/detail/ripemd_160.hpp
+/usr/include/caf/detail/safe_equal.hpp
+/usr/include/caf/detail/scope_guard.hpp
+/usr/include/caf/detail/select_all.hpp
+/usr/include/caf/detail/select_integer_type.hpp
+/usr/include/caf/detail/set_thread_name.hpp
+/usr/include/caf/detail/shared_spinlock.hpp
+/usr/include/caf/detail/simple_actor_clock.hpp
+/usr/include/caf/detail/socket_guard.hpp
+/usr/include/caf/detail/spawn_fwd.hpp
+/usr/include/caf/detail/split_join.hpp
+/usr/include/caf/detail/squashed_int.hpp
+/usr/include/caf/detail/stream_distribution_tree.hpp
+/usr/include/caf/detail/stream_sink_driver_impl.hpp
+/usr/include/caf/detail/stream_sink_impl.hpp
+/usr/include/caf/detail/stream_source_driver_impl.hpp
+/usr/include/caf/detail/stream_source_impl.hpp
+/usr/include/caf/detail/stream_stage_driver_impl.hpp
+/usr/include/caf/detail/stream_stage_impl.hpp
+/usr/include/caf/detail/stringification_inspector.hpp
+/usr/include/caf/detail/sync_request_bouncer.hpp
+/usr/include/caf/detail/tail_argument_token.hpp
+/usr/include/caf/detail/tbind.hpp
+/usr/include/caf/detail/test_actor_clock.hpp
+/usr/include/caf/detail/thread_safe_actor_clock.hpp
+/usr/include/caf/detail/tick_emitter.hpp
+/usr/include/caf/detail/try_match.hpp
+/usr/include/caf/detail/try_serialize.hpp
+/usr/include/caf/detail/tuple_vals.hpp
+/usr/include/caf/detail/type_erased_tuple_view.hpp
+/usr/include/caf/detail/type_erased_value_impl.hpp
+/usr/include/caf/detail/type_list.hpp
+/usr/include/caf/detail/type_name.hpp
+/usr/include/caf/detail/type_pair.hpp
+/usr/include/caf/detail/type_traits.hpp
+/usr/include/caf/detail/typed_actor_util.hpp
+/usr/include/caf/detail/unordered_flat_map.hpp
+/usr/include/caf/detail/uri_impl.hpp
+/usr/include/caf/detail/variant_data.hpp
+/usr/include/caf/dictionary.hpp
+/usr/include/caf/downstream.hpp
+/usr/include/caf/downstream_manager.hpp
+/usr/include/caf/downstream_manager_base.hpp
+/usr/include/caf/downstream_msg.hpp
+/usr/include/caf/duration.hpp
+/usr/include/caf/error.hpp
+/usr/include/caf/event_based_actor.hpp
+/usr/include/caf/exec_main.hpp
+/usr/include/caf/execution_unit.hpp
+/usr/include/caf/exit_reason.hpp
+/usr/include/caf/expected.hpp
+/usr/include/caf/extend.hpp
+/usr/include/caf/forwarding_actor_proxy.hpp
+/usr/include/caf/function_view.hpp
+/usr/include/caf/fused_downstream_manager.hpp
+/usr/include/caf/fwd.hpp
+/usr/include/caf/group.hpp
+/usr/include/caf/group_manager.hpp
+/usr/include/caf/group_module.hpp
+/usr/include/caf/illegal_message_element.hpp
+/usr/include/caf/inbound_path.hpp
+/usr/include/caf/index_mapping.hpp
+/usr/include/caf/infer_handle.hpp
+/usr/include/caf/input_range.hpp
+/usr/include/caf/interface_mismatch.hpp
+/usr/include/caf/intrusive/drr_cached_queue.hpp
+/usr/include/caf/intrusive/drr_queue.hpp
+/usr/include/caf/intrusive/fifo_inbox.hpp
+/usr/include/caf/intrusive/forward_iterator.hpp
+/usr/include/caf/intrusive/inbox_result.hpp
+/usr/include/caf/intrusive/lifo_inbox.hpp
+/usr/include/caf/intrusive/new_round_result.hpp
+/usr/include/caf/intrusive/singly_linked.hpp
+/usr/include/caf/intrusive/task_queue.hpp
+/usr/include/caf/intrusive/task_result.hpp
+/usr/include/caf/intrusive/wdrr_dynamic_multiplexed_queue.hpp
+/usr/include/caf/intrusive/wdrr_fixed_multiplexed_queue.hpp
+/usr/include/caf/intrusive_cow_ptr.hpp
+/usr/include/caf/intrusive_ptr.hpp
+/usr/include/caf/invalid_stream.hpp
+/usr/include/caf/invoke_message_result.hpp
+/usr/include/caf/io/abstract_broker.hpp
+/usr/include/caf/io/accept_handle.hpp
+/usr/include/caf/io/all.hpp
+/usr/include/caf/io/basp/all.hpp
+/usr/include/caf/io/basp/buffer_type.hpp
+/usr/include/caf/io/basp/connection_state.hpp
+/usr/include/caf/io/basp/endpoint_context.hpp
+/usr/include/caf/io/basp/header.hpp
+/usr/include/caf/io/basp/instance.hpp
+/usr/include/caf/io/basp/message_type.hpp
+/usr/include/caf/io/basp/routing_table.hpp
+/usr/include/caf/io/basp/version.hpp
+/usr/include/caf/io/basp_broker.hpp
+/usr/include/caf/io/broker.hpp
+/usr/include/caf/io/broker_servant.hpp
+/usr/include/caf/io/close.hpp
+/usr/include/caf/io/connect.hpp
+/usr/include/caf/io/connection_handle.hpp
+/usr/include/caf/io/connection_helper.hpp
+/usr/include/caf/io/datagram_handle.hpp
+/usr/include/caf/io/datagram_servant.hpp
+/usr/include/caf/io/doorman.hpp
+/usr/include/caf/io/fwd.hpp
+/usr/include/caf/io/handle.hpp
+/usr/include/caf/io/hook.hpp
+/usr/include/caf/io/middleman.hpp
+/usr/include/caf/io/middleman_actor.hpp
+/usr/include/caf/io/middleman_actor_impl.hpp
+/usr/include/caf/io/network/acceptor.hpp
+/usr/include/caf/io/network/acceptor_impl.hpp
+/usr/include/caf/io/network/acceptor_manager.hpp
+/usr/include/caf/io/network/datagram_handler.hpp
+/usr/include/caf/io/network/datagram_handler_impl.hpp
+/usr/include/caf/io/network/datagram_manager.hpp
+/usr/include/caf/io/network/datagram_servant_impl.hpp
+/usr/include/caf/io/network/default_multiplexer.hpp
+/usr/include/caf/io/network/doorman_impl.hpp
+/usr/include/caf/io/network/event_handler.hpp
+/usr/include/caf/io/network/interfaces.hpp
+/usr/include/caf/io/network/ip_endpoint.hpp
+/usr/include/caf/io/network/manager.hpp
+/usr/include/caf/io/network/multiplexer.hpp
+/usr/include/caf/io/network/native_socket.hpp
+/usr/include/caf/io/network/operation.hpp
+/usr/include/caf/io/network/pipe_reader.hpp
+/usr/include/caf/io/network/protocol.hpp
+/usr/include/caf/io/network/receive_buffer.hpp
+/usr/include/caf/io/network/rw_state.hpp
+/usr/include/caf/io/network/scribe_impl.hpp
+/usr/include/caf/io/network/stream.hpp
+/usr/include/caf/io/network/stream_impl.hpp
+/usr/include/caf/io/network/stream_manager.hpp
+/usr/include/caf/io/network/test_multiplexer.hpp
+/usr/include/caf/io/open.hpp
+/usr/include/caf/io/publish.hpp
+/usr/include/caf/io/publish_local_groups.hpp
+/usr/include/caf/io/receive_policy.hpp
+/usr/include/caf/io/remote_actor.hpp
+/usr/include/caf/io/remote_group.hpp
+/usr/include/caf/io/scribe.hpp
+/usr/include/caf/io/system_messages.hpp
+/usr/include/caf/io/typed_broker.hpp
+/usr/include/caf/io/unpublish.hpp
+/usr/include/caf/io/visitors.hpp
+/usr/include/caf/ip_address.hpp
+/usr/include/caf/ip_subnet.hpp
+/usr/include/caf/ipv4_address.hpp
+/usr/include/caf/ipv4_subnet.hpp
+/usr/include/caf/ipv6_address.hpp
+/usr/include/caf/ipv6_subnet.hpp
+/usr/include/caf/is_message_sink.hpp
+/usr/include/caf/is_timeout_or_catch_all.hpp
+/usr/include/caf/is_typed_actor.hpp
+/usr/include/caf/local_actor.hpp
+/usr/include/caf/locks.hpp
+/usr/include/caf/logger.hpp
+/usr/include/caf/mailbox_element.hpp
+/usr/include/caf/make_actor.hpp
+/usr/include/caf/make_config_option.hpp
+/usr/include/caf/make_copy_on_write.hpp
+/usr/include/caf/make_counted.hpp
+/usr/include/caf/make_message.hpp
+/usr/include/caf/make_sink_result.hpp
+/usr/include/caf/make_source_result.hpp
+/usr/include/caf/make_stage_result.hpp
+/usr/include/caf/make_type_erased_tuple_view.hpp
+/usr/include/caf/make_type_erased_value.hpp
+/usr/include/caf/make_type_erased_view.hpp
+/usr/include/caf/match_case.hpp
+/usr/include/caf/may_have_timeout.hpp
+/usr/include/caf/memory_managed.hpp
+/usr/include/caf/message.hpp
+/usr/include/caf/message_builder.hpp
+/usr/include/caf/message_handler.hpp
+/usr/include/caf/message_id.hpp
+/usr/include/caf/message_priority.hpp
+/usr/include/caf/message_view.hpp
+/usr/include/caf/meta/annotation.hpp
+/usr/include/caf/meta/hex_formatted.hpp
+/usr/include/caf/meta/load_callback.hpp
+/usr/include/caf/meta/omittable.hpp
+/usr/include/caf/meta/omittable_if_empty.hpp
+/usr/include/caf/meta/omittable_if_none.hpp
+/usr/include/caf/meta/save_callback.hpp
+/usr/include/caf/meta/type_name.hpp
+/usr/include/caf/mixin/actor_widget.hpp
+/usr/include/caf/mixin/behavior_changer.hpp
+/usr/include/caf/mixin/requester.hpp
+/usr/include/caf/mixin/sender.hpp
+/usr/include/caf/mixin/subscriber.hpp
+/usr/include/caf/monitorable_actor.hpp
+/usr/include/caf/named_actor_config.hpp
+/usr/include/caf/no_stages.hpp
+/usr/include/caf/node_id.hpp
+/usr/include/caf/none.hpp
+/usr/include/caf/openssl/all.hpp
+/usr/include/caf/openssl/manager.hpp
+/usr/include/caf/openssl/middleman_actor.hpp
+/usr/include/caf/openssl/publish.hpp
+/usr/include/caf/openssl/remote_actor.hpp
+/usr/include/caf/openssl/session.hpp
+/usr/include/caf/openssl/unpublish.hpp
+/usr/include/caf/optional.hpp
+/usr/include/caf/others.hpp
+/usr/include/caf/outbound_path.hpp
+/usr/include/caf/output_stream.hpp
+/usr/include/caf/param.hpp
+/usr/include/caf/pec.hpp
+/usr/include/caf/policy/arg.hpp
+/usr/include/caf/policy/categorized.hpp
+/usr/include/caf/policy/downstream_messages.hpp
+/usr/include/caf/policy/normal_messages.hpp
+/usr/include/caf/policy/priority_aware.hpp
+/usr/include/caf/policy/profiled.hpp
+/usr/include/caf/policy/scheduler_policy.hpp
+/usr/include/caf/policy/tcp.hpp
+/usr/include/caf/policy/udp.hpp
+/usr/include/caf/policy/unprofiled.hpp
+/usr/include/caf/policy/upstream_messages.hpp
+/usr/include/caf/policy/urgent_messages.hpp
+/usr/include/caf/policy/work_sharing.hpp
+/usr/include/caf/policy/work_stealing.hpp
+/usr/include/caf/primitive_variant.hpp
+/usr/include/caf/prohibit_top_level_spawn_marker.hpp
+/usr/include/caf/proxy_registry.hpp
+/usr/include/caf/raise_error.hpp
+/usr/include/caf/raw_event_based_actor.hpp
+/usr/include/caf/ref_counted.hpp
+/usr/include/caf/replies_to.hpp
+/usr/include/caf/response_handle.hpp
+/usr/include/caf/response_promise.hpp
+/usr/include/caf/response_type.hpp
+/usr/include/caf/result.hpp
+/usr/include/caf/resumable.hpp
+/usr/include/caf/runtime_settings_map.hpp
+/usr/include/caf/scheduled_actor.hpp
+/usr/include/caf/scheduler.hpp
+/usr/include/caf/scheduler/abstract_coordinator.hpp
+/usr/include/caf/scheduler/coordinator.hpp
+/usr/include/caf/scheduler/profiled_coordinator.hpp
+/usr/include/caf/scheduler/test_coordinator.hpp
+/usr/include/caf/scheduler/worker.hpp
+/usr/include/caf/scoped_actor.hpp
+/usr/include/caf/scoped_execution_unit.hpp
+/usr/include/caf/sec.hpp
+/usr/include/caf/send.hpp
+/usr/include/caf/serializer.hpp
+/usr/include/caf/skip.hpp
+/usr/include/caf/spawn_options.hpp
+/usr/include/caf/stateful_actor.hpp
+/usr/include/caf/static_visitor.hpp
+/usr/include/caf/stream.hpp
+/usr/include/caf/stream_aborter.hpp
+/usr/include/caf/stream_deserializer.hpp
+/usr/include/caf/stream_finalize_trait.hpp
+/usr/include/caf/stream_manager.hpp
+/usr/include/caf/stream_priority.hpp
+/usr/include/caf/stream_serializer.hpp
+/usr/include/caf/stream_sink.hpp
+/usr/include/caf/stream_sink_driver.hpp
+/usr/include/caf/stream_sink_trait.hpp
+/usr/include/caf/stream_slot.hpp
+/usr/include/caf/stream_source.hpp
+/usr/include/caf/stream_source_driver.hpp
+/usr/include/caf/stream_source_trait.hpp
+/usr/include/caf/stream_stage.hpp
+/usr/include/caf/stream_stage_driver.hpp
+/usr/include/caf/stream_stage_trait.hpp
+/usr/include/caf/streambuf.hpp
+/usr/include/caf/string_algorithms.hpp
+/usr/include/caf/string_view.hpp
+/usr/include/caf/sum_type.hpp
+/usr/include/caf/sum_type_access.hpp
+/usr/include/caf/sum_type_token.hpp
+/usr/include/caf/system_messages.hpp
+/usr/include/caf/tag/boxing_type.hpp
+/usr/include/caf/term.hpp
+/usr/include/caf/test/dsl.hpp
+/usr/include/caf/test/io_dsl.hpp
+/usr/include/caf/test/unit_test.hpp
+/usr/include/caf/test/unit_test_impl.hpp
+/usr/include/caf/thread_hook.hpp
+/usr/include/caf/timeout_definition.hpp
+/usr/include/caf/timespan.hpp
+/usr/include/caf/timestamp.hpp
+/usr/include/caf/to_string.hpp
+/usr/include/caf/type_erased_tuple.hpp
+/usr/include/caf/type_erased_value.hpp
+/usr/include/caf/type_nr.hpp
+/usr/include/caf/typed_actor.hpp
+/usr/include/caf/typed_actor_pointer.hpp
+/usr/include/caf/typed_actor_view.hpp
+/usr/include/caf/typed_behavior.hpp
+/usr/include/caf/typed_event_based_actor.hpp
+/usr/include/caf/typed_response_promise.hpp
+/usr/include/caf/uniform_type_info_map.hpp
+/usr/include/caf/unifyn.hpp
+/usr/include/caf/unit.hpp
+/usr/include/caf/unsafe_actor_handle_init.hpp
+/usr/include/caf/upstream_msg.hpp
+/usr/include/caf/uri.hpp
+/usr/include/caf/uri_builder.hpp
+/usr/include/caf/variant.hpp
+/usr/include/caf/weak_intrusive_ptr.hpp
+/usr/lib/libbroker.so
+/usr/lib/libcaf_core.so
+/usr/lib/libcaf_io.so
+/usr/lib/libcaf_openssl.so
 
 %files license
 %defattr(0644,root,root,0755)
 /usr/share/package-licenses/bro/COPYING
+/usr/share/package-licenses/bro/aux_bifcl_COPYING
+/usr/share/package-licenses/bro/aux_bifcl_cmake_COPYING
 /usr/share/package-licenses/bro/aux_binpac_COPYING
+/usr/share/package-licenses/bro/aux_binpac_cmake_COPYING
 /usr/share/package-licenses/bro/aux_bro-aux_COPYING
+/usr/share/package-licenses/bro/aux_bro-aux_cmake_COPYING
 /usr/share/package-licenses/bro/aux_bro-aux_plugin-support_skeleton_COPYING.edit-me
 /usr/share/package-licenses/bro/aux_broccoli_COPYING
 /usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-python_COPYING
+/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-python_cmake_COPYING
 /usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-ruby_COPYING
+/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-ruby_cmake_COPYING
+/usr/share/package-licenses/bro/aux_broccoli_cmake_COPYING
 /usr/share/package-licenses/bro/aux_broctl_COPYING
 /usr/share/package-licenses/bro/aux_broctl_aux_capstats_COPYING
+/usr/share/package-licenses/bro/aux_broctl_aux_capstats_cmake_COPYING
 /usr/share/package-licenses/bro/aux_broctl_aux_pysubnettree_COPYING
+/usr/share/package-licenses/bro/aux_broctl_aux_pysubnettree_cmake_COPYING
 /usr/share/package-licenses/bro/aux_broctl_aux_trace-summary_COPYING
-/usr/share/package-licenses/bro/aux_broker_COPYING
+/usr/share/package-licenses/bro/aux_broctl_aux_trace-summary_cmake_COPYING
+/usr/share/package-licenses/bro/aux_broctl_cmake_COPYING
+/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE
+/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE_ALTERNATIVE
+/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
+/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
+/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_LICENSE
+/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_tools_clang_LICENSE.TXT
+/usr/share/package-licenses/bro/aux_broker_cmake_COPYING
 /usr/share/package-licenses/bro/aux_btest_COPYING
 /usr/share/package-licenses/bro/aux_netcontrol-connectors_COPYING
-/usr/share/package-licenses/bro/aux_plugins_elasticsearch_COPYING
-/usr/share/package-licenses/bro/aux_plugins_kafka_COPYING
-/usr/share/package-licenses/bro/aux_plugins_myricom_COPYING
-/usr/share/package-licenses/bro/aux_plugins_netmap_COPYING
-/usr/share/package-licenses/bro/aux_plugins_pf_ring_COPYING
-/usr/share/package-licenses/bro/aux_plugins_redis_COPYING
+/usr/share/package-licenses/bro/cmake_COPYING
 /usr/share/package-licenses/bro/doc_LICENSE
+/usr/share/package-licenses/bro/src_3rdparty_caf_LICENSE
+/usr/share/package-licenses/bro/src_3rdparty_caf_LICENSE_ALTERNATIVE
+/usr/share/package-licenses/bro/src_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
+/usr/share/package-licenses/bro/src_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
 
 %files man
 %defattr(0644,root,root,0755)
 /usr/share/man/man8/bro.8
+
+%files plugins
+%defattr(-,root,root,-)
+/usr/lib/libbroker.so..
+/usr/lib/libbroker.so.0
+/usr/lib/libcaf_core.so.0.16.2
+/usr/lib/libcaf_io.so.0.16.2
+/usr/lib/libcaf_openssl.so.0.16.2
+
+%files python
+%defattr(-,root,root,-)
+
+%files python3
+%defattr(-,root,root,-)
+/usr/lib/python3*/*
