@@ -5,11 +5,11 @@
 # Source0 file verified with key 0xC68B494DF56ACC7E (info@bro.org)
 #
 Name     : bro
-Version  : 2.6
-Release  : 3
-URL      : https://www.bro.org/downloads/bro-2.6.tar.gz
-Source0  : https://www.bro.org/downloads/bro-2.6.tar.gz
-Source99 : https://www.bro.org/downloads/bro-2.6.tar.gz.asc
+Version  : 2.6.1
+Release  : 4
+URL      : https://www.bro.org/downloads/bro-2.6.1.tar.gz
+Source0  : https://www.bro.org/downloads/bro-2.6.1.tar.gz
+Source99 : https://www.bro.org/downloads/bro-2.6.1.tar.gz.asc
 Summary  : The Bro Client Communications Library
 Group    : Development/Tools
 License  : BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC-BY-4.0 NCSA
@@ -31,12 +31,14 @@ BuildRequires : buildreq-cmake
 BuildRequires : buildreq-distutils3
 BuildRequires : curl-dev
 BuildRequires : doxygen
+BuildRequires : e2fsprogs-dev
 BuildRequires : flex
 BuildRequires : git
 BuildRequires : glibc-dev
 BuildRequires : gperf
 BuildRequires : gperftools
 BuildRequires : gperftools-dev
+BuildRequires : krb5-dev
 BuildRequires : libpcap-dev
 BuildRequires : openssl-dev
 BuildRequires : protobuf-dev
@@ -128,14 +130,14 @@ python3 components for the bro package.
 
 
 %prep
-%setup -q -n bro-2.6
+%setup -q -n bro-2.6.1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1543575559
+export SOURCE_DATE_EPOCH=1545246082
 mkdir -p clr-build
 pushd clr-build
 export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
@@ -143,11 +145,11 @@ export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export CXXFLAGS="$CXXFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 %cmake ..
-make  %{?_smp_mflags} VERBOSE=1
+make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1543575559
+export SOURCE_DATE_EPOCH=1545246082
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
