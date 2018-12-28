@@ -6,7 +6,7 @@
 #
 Name     : bro
 Version  : 2.6.1
-Release  : 4
+Release  : 5
 URL      : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source99 : https://www.bro.org/downloads/bro-2.6.1.tar.gz.asc
