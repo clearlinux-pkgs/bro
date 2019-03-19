@@ -4,9 +4,10 @@
 #
 # Source0 file verified with key 0xC68B494DF56ACC7E (info@bro.org)
 #
+%define keepstatic 1
 Name     : bro
 Version  : 2.6.1
-Release  : 5
+Release  : 7
 URL      : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source99 : https://www.bro.org/downloads/bro-2.6.1.tar.gz.asc
@@ -20,12 +21,9 @@ Requires: bro-man = %{version}-%{release}
 Requires: bro-plugins = %{version}-%{release}
 Requires: bro-python = %{version}-%{release}
 Requires: bro-python3 = %{version}-%{release}
-Requires: Sphinx
-Requires: sphinx_rtd_theme
 BuildRequires : bash coreutils gzip
 BuildRequires : beignet-dev
 BuildRequires : bison
-BuildRequires : bison-dev
 BuildRequires : boost-dev
 BuildRequires : buildreq-cmake
 BuildRequires : buildreq-distutils3
@@ -62,7 +60,6 @@ Summary: bin components for the bro package.
 Group: Binaries
 Requires: bro-data = %{version}-%{release}
 Requires: bro-license = %{version}-%{release}
-Requires: bro-man = %{version}-%{release}
 
 %description bin
 bin components for the bro package.
@@ -82,6 +79,7 @@ Group: Development
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
 Provides: bro-devel = %{version}-%{release}
+Requires: bro = %{version}-%{release}
 
 %description dev
 dev components for the bro package.
@@ -137,9 +135,10 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1545246082
+export SOURCE_DATE_EPOCH=1552957530
 mkdir -p clr-build
 pushd clr-build
+export LDFLAGS="${LDFLAGS} -fno-lto"
 export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
@@ -149,7 +148,7 @@ make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1545246082
+export SOURCE_DATE_EPOCH=1552957530
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
@@ -1834,6 +1833,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/include/caf/uri_builder.hpp
 /usr/include/caf/variant.hpp
 /usr/include/caf/weak_intrusive_ptr.hpp
+/usr/lib/*.a
 /usr/lib/libbroker.so
 /usr/lib/libcaf_core.so
 /usr/lib/libcaf_io.so
