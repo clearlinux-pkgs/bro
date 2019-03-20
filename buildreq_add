@@ -4,6 +4,4 @@ libpcap-dev
 zlib-dev
 flex
 bison
-gperftools
-gperf
-gperftools-dev
+swig

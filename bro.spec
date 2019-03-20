@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.1
-Release  : 7
+Release  : 8
 URL      : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source99 : https://www.bro.org/downloads/bro-2.6.1.tar.gz.asc
@@ -16,11 +16,13 @@ Group    : Development/Tools
 License  : BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC-BY-4.0 NCSA
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
+Requires: bro-lib = %{version}-%{release}
 Requires: bro-license = %{version}-%{release}
 Requires: bro-man = %{version}-%{release}
 Requires: bro-plugins = %{version}-%{release}
 Requires: bro-python = %{version}-%{release}
 Requires: bro-python3 = %{version}-%{release}
+Requires: bro-staticdev = %{version}-%{release}
 BuildRequires : bash coreutils gzip
 BuildRequires : beignet-dev
 BuildRequires : bison
@@ -33,9 +35,6 @@ BuildRequires : e2fsprogs-dev
 BuildRequires : flex
 BuildRequires : git
 BuildRequires : glibc-dev
-BuildRequires : gperf
-BuildRequires : gperftools
-BuildRequires : gperftools-dev
 BuildRequires : krb5-dev
 BuildRequires : libpcap-dev
 BuildRequires : openssl-dev
@@ -44,6 +43,7 @@ BuildRequires : python3
 BuildRequires : python3-dev
 BuildRequires : qtbase-dev mesa-dev
 BuildRequires : ruby
+BuildRequires : swig
 BuildRequires : texlive
 BuildRequires : zlib-dev
 
@@ -76,6 +76,7 @@ data components for the bro package.
 %package dev
 Summary: dev components for the bro package.
 Group: Development
+Requires: bro-lib = %{version}-%{release}
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
 Provides: bro-devel = %{version}-%{release}
@@ -83,6 +84,16 @@ Requires: bro = %{version}-%{release}
 
 %description dev
 dev components for the bro package.
+
+
+%package lib
+Summary: lib components for the bro package.
+Group: Libraries
+Requires: bro-data = %{version}-%{release}
+Requires: bro-license = %{version}-%{release}
+
+%description lib
+lib components for the bro package.
 
 
 %package license
@@ -127,6 +138,15 @@ Requires: python3-core
 python3 components for the bro package.
 
 
+%package staticdev
+Summary: staticdev components for the bro package.
+Group: Default
+Requires: bro-dev = %{version}-%{release}
+
+%description staticdev
+staticdev components for the bro package.
+
+
 %prep
 %setup -q -n bro-2.6.1
 
@@ -135,7 +155,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1552957530
+export SOURCE_DATE_EPOCH=1553095105
 mkdir -p clr-build
 pushd clr-build
 export LDFLAGS="${LDFLAGS} -fno-lto"
@@ -143,12 +163,12 @@ export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
 export CXXFLAGS="$CXXFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
-%cmake ..
+%cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBRO_ROOT_DIR=/usr -DBRO_ETC_INSTALL_DIR=/etc -DINSTALL_BROCTL=true -DBRO_LOCAL_STATE_DIR=/var -DBRO_SPOOL_DIR=/var/spool/bro -DBRO_LOG_DIR=/var/log/nsm/bro
 make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1552957530
+export SOURCE_DATE_EPOCH=1553095105
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
@@ -197,6 +217,37 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 
 %files
 %defattr(-,root,root,-)
+/usr/lib/broctl/BroControl/__init__.py
+/usr/lib/broctl/BroControl/brocmd.py
+/usr/lib/broctl/BroControl/broctl.py
+/usr/lib/broctl/BroControl/cmdresult.py
+/usr/lib/broctl/BroControl/config.py
+/usr/lib/broctl/BroControl/control.py
+/usr/lib/broctl/BroControl/cron.py
+/usr/lib/broctl/BroControl/doc.py
+/usr/lib/broctl/BroControl/events.py
+/usr/lib/broctl/BroControl/exceptions.py
+/usr/lib/broctl/BroControl/execute.py
+/usr/lib/broctl/BroControl/install.py
+/usr/lib/broctl/BroControl/lock.py
+/usr/lib/broctl/BroControl/node.py
+/usr/lib/broctl/BroControl/options.py
+/usr/lib/broctl/BroControl/plugin.py
+/usr/lib/broctl/BroControl/pluginreg.py
+/usr/lib/broctl/BroControl/printdoc.py
+/usr/lib/broctl/BroControl/py3bro.py
+/usr/lib/broctl/BroControl/ssh_runner.py
+/usr/lib/broctl/BroControl/state.py
+/usr/lib/broctl/BroControl/util.py
+/usr/lib/broctl/BroControl/utilcurses.py
+/usr/lib/broctl/BroControl/version.py
+/usr/lib/broctl/plugins/TestPlugin.py
+/usr/lib/broctl/plugins/lb_custom.py
+/usr/lib/broctl/plugins/lb_myricom.py
+/usr/lib/broctl/plugins/lb_pf_ring.py
+/usr/lib/broctl/plugins/ps.py
+/usr/lib/python/SubnetTree.py
+/var/spool/bro/broctl-config.sh
 
 %files bin
 %defattr(-,root,root,-)
@@ -204,6 +255,9 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/bin/binpac
 /usr/bin/bro
 /usr/bin/bro-config
+/usr/bin/broctl
+/usr/bin/capstats
+/usr/bin/trace-summary
 
 %files data
 %defattr(-,root,root,-)
@@ -608,6 +662,12 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/base/utils/thresholds.bro
 /usr/share/bro/base/utils/time.bro
 /usr/share/bro/base/utils/urls.bro
+/usr/share/bro/broctl/__load__.bro
+/usr/share/bro/broctl/auto.bro
+/usr/share/bro/broctl/check.bro
+/usr/share/bro/broctl/main.bro
+/usr/share/bro/broctl/process-trace.bro
+/usr/share/bro/broctl/standalone.bro
 /usr/share/bro/broxygen/__load__.bro
 /usr/share/bro/broxygen/example.bro
 /usr/share/bro/cmake/AddUninstallTarget.cmake
@@ -774,6 +834,29 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/bro/policy/tuning/json-logs.bro
 /usr/share/bro/policy/tuning/track-all-assets.bro
 /usr/share/bro/site/local.bro
+/usr/share/broctl/scripts/archive-log
+/usr/share/broctl/scripts/broctl-config.sh
+/usr/share/broctl/scripts/check-config
+/usr/share/broctl/scripts/crash-diag
+/usr/share/broctl/scripts/delete-log
+/usr/share/broctl/scripts/expire-crash
+/usr/share/broctl/scripts/expire-logs
+/usr/share/broctl/scripts/helpers/check-pid
+/usr/share/broctl/scripts/helpers/df
+/usr/share/broctl/scripts/helpers/first-line
+/usr/share/broctl/scripts/helpers/start
+/usr/share/broctl/scripts/helpers/stop
+/usr/share/broctl/scripts/helpers/to-bytes.awk
+/usr/share/broctl/scripts/helpers/top
+/usr/share/broctl/scripts/make-archive-name
+/usr/share/broctl/scripts/post-terminate
+/usr/share/broctl/scripts/postprocessors/summarize-connections
+/usr/share/broctl/scripts/run-bro
+/usr/share/broctl/scripts/run-bro-on-trace
+/usr/share/broctl/scripts/send-mail
+/usr/share/broctl/scripts/set-bro-path
+/usr/share/broctl/scripts/stats-to-csv
+/usr/share/broctl/scripts/update
 
 %files dev
 %defattr(-,root,root,-)
@@ -1833,11 +1916,14 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/include/caf/uri_builder.hpp
 /usr/include/caf/variant.hpp
 /usr/include/caf/weak_intrusive_ptr.hpp
-/usr/lib/*.a
 /usr/lib/libbroker.so
 /usr/lib/libcaf_core.so
 /usr/lib/libcaf_io.so
 /usr/lib/libcaf_openssl.so
+
+%files lib
+%defattr(-,root,root,-)
+/usr/lib/python/_SubnetTree.so
 
 %files license
 %defattr(0644,root,root,0755)
@@ -1881,7 +1967,9 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 
 %files man
 %defattr(0644,root,root,0755)
+/usr/share/man/man1/trace-summary.1
 /usr/share/man/man8/bro.8
+/usr/share/man/man8/broctl.8
 
 %files plugins
 %defattr(-,root,root,-)
@@ -1897,3 +1985,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 %files python3
 %defattr(-,root,root,-)
 /usr/lib/python3*/*
+
+%files staticdev
+%defattr(-,root,root,-)
+/usr/lib/libbinpac.a
