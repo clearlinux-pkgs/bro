@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.1
-Release  : 8
+Release  : 9
 URL      : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source99 : https://www.bro.org/downloads/bro-2.6.1.tar.gz.asc
@@ -155,7 +155,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1553095105
+export SOURCE_DATE_EPOCH=1553095364
 mkdir -p clr-build
 pushd clr-build
 export LDFLAGS="${LDFLAGS} -fno-lto"
@@ -168,7 +168,7 @@ make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1553095105
+export SOURCE_DATE_EPOCH=1553095364
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
@@ -217,6 +217,7 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 
 %files
 %defattr(-,root,root,-)
+%exclude /var/spool/bro/broctl-config.sh
 /usr/lib/broctl/BroControl/__init__.py
 /usr/lib/broctl/BroControl/brocmd.py
 /usr/lib/broctl/BroControl/broctl.py
@@ -247,7 +248,6 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/lib/broctl/plugins/lb_pf_ring.py
 /usr/lib/broctl/plugins/ps.py
 /usr/lib/python/SubnetTree.py
-/var/spool/bro/broctl-config.sh
 
 %files bin
 %defattr(-,root,root,-)
