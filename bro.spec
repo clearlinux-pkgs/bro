@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.1
-Release  : 9
+Release  : 10
 URL      : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.1.tar.gz
 Source99 : https://www.bro.org/downloads/bro-2.6.1.tar.gz.asc
