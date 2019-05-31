@@ -6,14 +6,14 @@
 #
 %define keepstatic 1
 Name     : bro
-Version  : 2.6.1
-Release  : 10
-URL      : https://www.bro.org/downloads/bro-2.6.1.tar.gz
-Source0  : https://www.bro.org/downloads/bro-2.6.1.tar.gz
-Source99 : https://www.bro.org/downloads/bro-2.6.1.tar.gz.asc
+Version  : 2.6.2
+Release  : 11
+URL      : https://www.bro.org/downloads/bro-2.6.2.tar.gz
+Source0  : https://www.bro.org/downloads/bro-2.6.2.tar.gz
+Source99 : https://www.bro.org/downloads/bro-2.6.2.tar.gz.asc
 Summary  : The Bro Client Communications Library
 Group    : Development/Tools
-License  : BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC-BY-4.0 NCSA
+License  : BSD-2-Clause BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC-BY-4.0 NCSA
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
 Requires: bro-lib = %{version}-%{release}
@@ -22,7 +22,6 @@ Requires: bro-man = %{version}-%{release}
 Requires: bro-plugins = %{version}-%{release}
 Requires: bro-python = %{version}-%{release}
 Requires: bro-python3 = %{version}-%{release}
-Requires: bro-staticdev = %{version}-%{release}
 BuildRequires : bash coreutils gzip
 BuildRequires : beignet-dev
 BuildRequires : bison
@@ -80,6 +79,7 @@ Requires: bro-lib = %{version}-%{release}
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
 Provides: bro-devel = %{version}-%{release}
+Requires: bro = %{version}-%{release}
 Requires: bro = %{version}-%{release}
 
 %description dev
@@ -142,33 +142,36 @@ python3 components for the bro package.
 Summary: staticdev components for the bro package.
 Group: Default
 Requires: bro-dev = %{version}-%{release}
+Requires: bro-dev = %{version}-%{release}
 
 %description staticdev
 staticdev components for the bro package.
 
 
 %prep
-%setup -q -n bro-2.6.1
+%setup -q -n bro-2.6.2
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1553095364
+export SOURCE_DATE_EPOCH=1559337013
 mkdir -p clr-build
 pushd clr-build
-export LDFLAGS="${LDFLAGS} -fno-lto"
-export CFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
-export FCFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
-export FFLAGS="$CFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
-export CXXFLAGS="$CXXFLAGS -fstack-protector-strong -mzero-caller-saved-regs=used "
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
+export FCFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
+export FFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
+export CXXFLAGS="$CXXFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
 %cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBRO_ROOT_DIR=/usr -DBRO_ETC_INSTALL_DIR=/etc -DINSTALL_BROCTL=true -DBRO_LOCAL_STATE_DIR=/var -DBRO_SPOOL_DIR=/var/spool/bro -DBRO_LOG_DIR=/var/log/nsm/bro
 make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1553095364
+export SOURCE_DATE_EPOCH=1559337013
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
@@ -197,9 +200,11 @@ cp aux/broker/3rdparty/caf/LICENSE %{buildroot}/usr/share/package-licenses/bro/a
 cp aux/broker/3rdparty/caf/LICENSE_ALTERNATIVE %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE_ALTERNATIVE
 cp aux/broker/3rdparty/caf/libcaf_python/third_party/pybind/LICENSE %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
 cp aux/broker/3rdparty/caf/libcaf_python/third_party/pybind/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
+cp aux/broker/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broker_COPYING
 cp aux/broker/bindings/python/3rdparty/pybind11/LICENSE %{buildroot}/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_LICENSE
 cp aux/broker/bindings/python/3rdparty/pybind11/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_tools_clang_LICENSE.TXT
 cp aux/broker/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broker_cmake_COPYING
+cp aux/broker/tests/benchmark/readerwriterqueue/LICENSE.md %{buildroot}/usr/share/package-licenses/bro/aux_broker_tests_benchmark_readerwriterqueue_LICENSE.md
 cp aux/btest/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_btest_COPYING
 cp aux/netcontrol-connectors/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_netcontrol-connectors_COPYING
 cp cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/cmake_COPYING
@@ -1953,9 +1958,11 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 /usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE_ALTERNATIVE
 /usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
 /usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
+/usr/share/package-licenses/bro/aux_broker_COPYING
 /usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_LICENSE
 /usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_tools_clang_LICENSE.TXT
 /usr/share/package-licenses/bro/aux_broker_cmake_COPYING
+/usr/share/package-licenses/bro/aux_broker_tests_benchmark_readerwriterqueue_LICENSE.md
 /usr/share/package-licenses/bro/aux_btest_COPYING
 /usr/share/package-licenses/bro/aux_netcontrol-connectors_COPYING
 /usr/share/package-licenses/bro/cmake_COPYING
