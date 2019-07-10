@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.2
-Release  : 11
+Release  : 12
 URL      : https://www.bro.org/downloads/bro-2.6.2.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.2.tar.gz
 Source99 : https://www.bro.org/downloads/bro-2.6.2.tar.gz.asc
@@ -34,6 +34,7 @@ BuildRequires : e2fsprogs-dev
 BuildRequires : flex
 BuildRequires : git
 BuildRequires : glibc-dev
+BuildRequires : gperftools-dev
 BuildRequires : krb5-dev
 BuildRequires : libpcap-dev
 BuildRequires : openssl-dev
@@ -45,6 +46,7 @@ BuildRequires : ruby
 BuildRequires : swig
 BuildRequires : texlive
 BuildRequires : zlib-dev
+Patch1: CVE-2019-8457.patch
 
 %description
 Broccoli enables your applications to speak the Bro communication protocol,
@@ -79,7 +81,6 @@ Requires: bro-lib = %{version}-%{release}
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
 Provides: bro-devel = %{version}-%{release}
-Requires: bro = %{version}-%{release}
 Requires: bro = %{version}-%{release}
 
 %description dev
@@ -142,7 +143,6 @@ python3 components for the bro package.
 Summary: staticdev components for the bro package.
 Group: Default
 Requires: bro-dev = %{version}-%{release}
-Requires: bro-dev = %{version}-%{release}
 
 %description staticdev
 staticdev components for the bro package.
@@ -150,28 +150,30 @@ staticdev components for the bro package.
 
 %prep
 %setup -q -n bro-2.6.2
+%patch1 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1559337013
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1562727705
 mkdir -p clr-build
 pushd clr-build
+export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
-export FCFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
-export FFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
-export CXXFLAGS="$CXXFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
 %cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBRO_ROOT_DIR=/usr -DBRO_ETC_INSTALL_DIR=/etc -DINSTALL_BROCTL=true -DBRO_LOCAL_STATE_DIR=/var -DBRO_SPOOL_DIR=/var/spool/bro -DBRO_LOG_DIR=/var/log/nsm/bro
-make  %{?_smp_mflags}
+make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1559337013
+export SOURCE_DATE_EPOCH=1562727705
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING

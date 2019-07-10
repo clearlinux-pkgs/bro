@@ -11,4 +11,5 @@ libpython3.7m.so.1.0
 libresolv.so.2
 libssl.so.1.1
 libstdc++.so.6
+libtcmalloc.so.4
 libz.so.1
