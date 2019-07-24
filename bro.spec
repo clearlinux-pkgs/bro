@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.2
-Release  : 13
+Release  : 14
 URL      : https://www.bro.org/downloads/bro-2.6.2.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.2.tar.gz
 Source99 : https://www.bro.org/downloads/bro-2.6.2.tar.gz.asc
@@ -23,7 +23,6 @@ Requires: bro-plugins = %{version}-%{release}
 Requires: bro-python = %{version}-%{release}
 Requires: bro-python3 = %{version}-%{release}
 BuildRequires : bash coreutils gzip
-BuildRequires : beignet-dev
 BuildRequires : bison
 BuildRequires : boost-dev
 BuildRequires : buildreq-cmake
@@ -37,6 +36,7 @@ BuildRequires : glibc-dev
 BuildRequires : gperftools-dev
 BuildRequires : krb5-dev
 BuildRequires : libpcap-dev
+BuildRequires : opencl-headers-dev
 BuildRequires : openssl-dev
 BuildRequires : protobuf-dev
 BuildRequires : python3
@@ -157,7 +157,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1562727705
+export SOURCE_DATE_EPOCH=1564009064
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -173,7 +173,7 @@ make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1562727705
+export SOURCE_DATE_EPOCH=1564009064
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING

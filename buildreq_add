@@ -5,3 +5,4 @@ zlib-dev
 flex
 bison
 swig
+opencl-headers-dev
