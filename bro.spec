@@ -7,10 +7,10 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.2
-Release  : 14
+Release  : 15
 URL      : https://www.bro.org/downloads/bro-2.6.2.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.2.tar.gz
-Source99 : https://www.bro.org/downloads/bro-2.6.2.tar.gz.asc
+Source1 : https://www.bro.org/downloads/bro-2.6.2.tar.gz.asc
 Summary  : The Bro Client Communications Library
 Group    : Development/Tools
 License  : BSD-2-Clause BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC-BY-4.0 NCSA
@@ -22,6 +22,7 @@ Requires: bro-man = %{version}-%{release}
 Requires: bro-plugins = %{version}-%{release}
 Requires: bro-python = %{version}-%{release}
 Requires: bro-python3 = %{version}-%{release}
+Requires: pysubnettree
 BuildRequires : bash coreutils gzip
 BuildRequires : bison
 BuildRequires : boost-dev
@@ -81,6 +82,7 @@ Requires: bro-lib = %{version}-%{release}
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
 Provides: bro-devel = %{version}-%{release}
+Requires: bro = %{version}-%{release}
 Requires: bro = %{version}-%{release}
 
 %description dev
@@ -143,6 +145,7 @@ python3 components for the bro package.
 Summary: staticdev components for the bro package.
 Group: Default
 Requires: bro-dev = %{version}-%{release}
+Requires: bro-dev = %{version}-%{release}
 
 %description staticdev
 staticdev components for the bro package.
@@ -157,23 +160,23 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1564009064
+export SOURCE_DATE_EPOCH=1564897808
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
-export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
-export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
-export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export CFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
+export FCFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
+export FFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
+export CXXFLAGS="$CXXFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
 %cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBRO_ROOT_DIR=/usr -DBRO_ETC_INSTALL_DIR=/etc -DINSTALL_BROCTL=true -DBRO_LOCAL_STATE_DIR=/var -DBRO_SPOOL_DIR=/var/spool/bro -DBRO_LOG_DIR=/var/log/nsm/bro
 make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1564009064
+export SOURCE_DATE_EPOCH=1564897808
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
@@ -218,13 +221,14 @@ cp src/3rdparty/caf/libcaf_python/third_party/pybind/tools/clang/LICENSE.TXT %{b
 pushd clr-build
 %make_install
 popd
+## Remove excluded files
+rm -f %{buildroot}/var/spool/bro/broctl-config.sh
 ## install_append content
 rm -f %{buildroot}/usr/include/binpac.h.in
 ## install_append end
 
 %files
 %defattr(-,root,root,-)
-%exclude /var/spool/bro/broctl-config.sh
 /usr/lib/broctl/BroControl/__init__.py
 /usr/lib/broctl/BroControl/brocmd.py
 /usr/lib/broctl/BroControl/broctl.py
