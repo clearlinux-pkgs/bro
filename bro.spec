@@ -6,11 +6,11 @@
 #
 %define keepstatic 1
 Name     : bro
-Version  : 2.6.3
-Release  : 16
-URL      : https://www.bro.org/downloads/bro-2.6.3.tar.gz
-Source0  : https://www.bro.org/downloads/bro-2.6.3.tar.gz
-Source1 : https://www.bro.org/downloads/bro-2.6.3.tar.gz.asc
+Version  : 2.6.4
+Release  : 18
+URL      : https://www.bro.org/downloads/bro-2.6.4.tar.gz
+Source0  : https://www.bro.org/downloads/bro-2.6.4.tar.gz
+Source1 : https://www.bro.org/downloads/bro-2.6.4.tar.gz.asc
 Summary  : The Bro Client Communications Library
 Group    : Development/Tools
 License  : BSD-2-Clause BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC-BY-4.0 NCSA
@@ -40,6 +40,7 @@ BuildRequires : libpcap-dev
 BuildRequires : opencl-headers-dev
 BuildRequires : openssl-dev
 BuildRequires : protobuf-dev
+BuildRequires : pysubnettree
 BuildRequires : python3
 BuildRequires : python3-dev
 BuildRequires : qtbase-dev mesa-dev
@@ -152,7 +153,7 @@ staticdev components for the bro package.
 
 
 %prep
-%setup -q -n bro-2.6.3
+%setup -q -n bro-2.6.4
 %patch1 -p1
 
 %build
@@ -160,7 +161,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1565363411
+export SOURCE_DATE_EPOCH=1567179491
 mkdir -p clr-build
 pushd clr-build
 # -Werror is for werrorists
@@ -177,7 +178,7 @@ make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1565363411
+export SOURCE_DATE_EPOCH=1567179491
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
