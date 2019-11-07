@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.4
-Release  : 18
+Release  : 19
 URL      : https://www.bro.org/downloads/bro-2.6.4.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.4.tar.gz
 Source1 : https://www.bro.org/downloads/bro-2.6.4.tar.gz.asc
@@ -48,7 +48,7 @@ BuildRequires : ruby
 BuildRequires : swig
 BuildRequires : texlive
 BuildRequires : zlib-dev
-Patch1: CVE-2019-8457.patch
+Patch1: Update-to-SQLite-3.30.1.patch
 
 %description
 Broccoli enables your applications to speak the Bro communication protocol,
@@ -83,7 +83,6 @@ Requires: bro-lib = %{version}-%{release}
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
 Provides: bro-devel = %{version}-%{release}
-Requires: bro = %{version}-%{release}
 Requires: bro = %{version}-%{release}
 
 %description dev
@@ -146,7 +145,6 @@ python3 components for the bro package.
 Summary: staticdev components for the bro package.
 Group: Default
 Requires: bro-dev = %{version}-%{release}
-Requires: bro-dev = %{version}-%{release}
 
 %description staticdev
 staticdev components for the bro package.
@@ -154,6 +152,7 @@ staticdev components for the bro package.
 
 %prep
 %setup -q -n bro-2.6.4
+cd %{_builddir}/bro-2.6.4
 %patch1 -p1
 
 %build
@@ -161,65 +160,64 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1567179491
+export SOURCE_DATE_EPOCH=1573098809
 mkdir -p clr-build
 pushd clr-build
-# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
-export FCFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
-export FFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
-export CXXFLAGS="$CXXFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
 %cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBRO_ROOT_DIR=/usr -DBRO_ETC_INSTALL_DIR=/etc -DINSTALL_BROCTL=true -DBRO_LOCAL_STATE_DIR=/var -DBRO_SPOOL_DIR=/var/spool/bro -DBRO_LOG_DIR=/var/log/nsm/bro
-make  %{?_smp_mflags} VERBOSE=1
+make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1567179491
+export SOURCE_DATE_EPOCH=1573098809
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
-cp COPYING %{buildroot}/usr/share/package-licenses/bro/COPYING
-cp aux/bifcl/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_bifcl_COPYING
-cp aux/bifcl/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_bifcl_cmake_COPYING
-cp aux/binpac/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_binpac_COPYING
-cp aux/binpac/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_binpac_cmake_COPYING
-cp aux/bro-aux/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_bro-aux_COPYING
-cp aux/bro-aux/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_bro-aux_cmake_COPYING
-cp aux/bro-aux/plugin-support/skeleton/COPYING.edit-me %{buildroot}/usr/share/package-licenses/bro/aux_bro-aux_plugin-support_skeleton_COPYING.edit-me
-cp aux/broccoli/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_COPYING
-cp aux/broccoli/bindings/broccoli-python/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-python_COPYING
-cp aux/broccoli/bindings/broccoli-python/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-python_cmake_COPYING
-cp aux/broccoli/bindings/broccoli-ruby/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-ruby_COPYING
-cp aux/broccoli/bindings/broccoli-ruby/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-ruby_cmake_COPYING
-cp aux/broccoli/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broccoli_cmake_COPYING
-cp aux/broctl/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_COPYING
-cp aux/broctl/aux/capstats/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_capstats_COPYING
-cp aux/broctl/aux/capstats/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_capstats_cmake_COPYING
-cp aux/broctl/aux/pysubnettree/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_pysubnettree_COPYING
-cp aux/broctl/aux/pysubnettree/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_pysubnettree_cmake_COPYING
-cp aux/broctl/aux/trace-summary/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_trace-summary_COPYING
-cp aux/broctl/aux/trace-summary/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_aux_trace-summary_cmake_COPYING
-cp aux/broctl/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broctl_cmake_COPYING
-cp aux/broker/3rdparty/caf/LICENSE %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE
-cp aux/broker/3rdparty/caf/LICENSE_ALTERNATIVE %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE_ALTERNATIVE
-cp aux/broker/3rdparty/caf/libcaf_python/third_party/pybind/LICENSE %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
-cp aux/broker/3rdparty/caf/libcaf_python/third_party/pybind/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
-cp aux/broker/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broker_COPYING
-cp aux/broker/bindings/python/3rdparty/pybind11/LICENSE %{buildroot}/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_LICENSE
-cp aux/broker/bindings/python/3rdparty/pybind11/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_tools_clang_LICENSE.TXT
-cp aux/broker/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_broker_cmake_COPYING
-cp aux/broker/tests/benchmark/readerwriterqueue/LICENSE.md %{buildroot}/usr/share/package-licenses/bro/aux_broker_tests_benchmark_readerwriterqueue_LICENSE.md
-cp aux/btest/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_btest_COPYING
-cp aux/netcontrol-connectors/COPYING %{buildroot}/usr/share/package-licenses/bro/aux_netcontrol-connectors_COPYING
-cp cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/cmake_COPYING
-cp doc/LICENSE %{buildroot}/usr/share/package-licenses/bro/doc_LICENSE
-cp src/3rdparty/caf/LICENSE %{buildroot}/usr/share/package-licenses/bro/src_3rdparty_caf_LICENSE
-cp src/3rdparty/caf/LICENSE_ALTERNATIVE %{buildroot}/usr/share/package-licenses/bro/src_3rdparty_caf_LICENSE_ALTERNATIVE
-cp src/3rdparty/caf/libcaf_python/third_party/pybind/LICENSE %{buildroot}/usr/share/package-licenses/bro/src_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
-cp src/3rdparty/caf/libcaf_python/third_party/pybind/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/src_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
+cp %{_builddir}/bro-2.6.4/COPYING %{buildroot}/usr/share/package-licenses/bro/095bff679080110031d9603cd5678de136085197
+cp %{_builddir}/bro-2.6.4/aux/bifcl/COPYING %{buildroot}/usr/share/package-licenses/bro/095bff679080110031d9603cd5678de136085197
+cp %{_builddir}/bro-2.6.4/aux/bifcl/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/binpac/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/binpac/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/bro-aux/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/bro-aux/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/bro-aux/plugin-support/skeleton/COPYING.edit-me %{buildroot}/usr/share/package-licenses/bro/38a91fe77596c51b40b5192189c1de2a1396e127
+cp %{_builddir}/bro-2.6.4/aux/broccoli/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/broccoli/bindings/broccoli-python/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/broccoli/bindings/broccoli-python/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/broccoli/bindings/broccoli-ruby/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/broccoli/bindings/broccoli-ruby/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/broccoli/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/broctl/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/broctl/aux/capstats/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/broctl/aux/capstats/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/broctl/aux/pysubnettree/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/broctl/aux/pysubnettree/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/broctl/aux/trace-summary/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/broctl/aux/trace-summary/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/broctl/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/broker/3rdparty/caf/LICENSE %{buildroot}/usr/share/package-licenses/bro/6daa99a30d82f8786b3523d3074a271dec286d5e
+cp %{_builddir}/bro-2.6.4/aux/broker/3rdparty/caf/LICENSE_ALTERNATIVE %{buildroot}/usr/share/package-licenses/bro/3cba29011be2b9d59f6204d6fa0a386b1b2dbd90
+cp %{_builddir}/bro-2.6.4/aux/broker/3rdparty/caf/libcaf_python/third_party/pybind/LICENSE %{buildroot}/usr/share/package-licenses/bro/71a7f368f90789db807331860cb72d10abdb4acb
+cp %{_builddir}/bro-2.6.4/aux/broker/3rdparty/caf/libcaf_python/third_party/pybind/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/0ebae4fcb66d6688d40b27451ac84cf5b5c8862a
+cp %{_builddir}/bro-2.6.4/aux/broker/COPYING %{buildroot}/usr/share/package-licenses/bro/3ab1c7ffea3eb25703969e96f8f4a62ba6e36345
+cp %{_builddir}/bro-2.6.4/aux/broker/bindings/python/3rdparty/pybind11/LICENSE %{buildroot}/usr/share/package-licenses/bro/a33b61f04391a38904373d020e7fbabf211383f6
+cp %{_builddir}/bro-2.6.4/aux/broker/bindings/python/3rdparty/pybind11/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/0ebae4fcb66d6688d40b27451ac84cf5b5c8862a
+cp %{_builddir}/bro-2.6.4/aux/broker/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/aux/broker/tests/benchmark/readerwriterqueue/LICENSE.md %{buildroot}/usr/share/package-licenses/bro/e85bbc8175bc6b4a99301cd29a2f05118656b547
+cp %{_builddir}/bro-2.6.4/aux/btest/COPYING %{buildroot}/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+cp %{_builddir}/bro-2.6.4/aux/netcontrol-connectors/COPYING %{buildroot}/usr/share/package-licenses/bro/7ba045683ca423eb9191e47cd13b80d9f8133d98
+cp %{_builddir}/bro-2.6.4/cmake/COPYING %{buildroot}/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
+cp %{_builddir}/bro-2.6.4/doc/LICENSE %{buildroot}/usr/share/package-licenses/bro/3d1626ff5f531f387f20f25b36500bbe1f960e3d
+cp %{_builddir}/bro-2.6.4/src/3rdparty/caf/LICENSE %{buildroot}/usr/share/package-licenses/bro/6daa99a30d82f8786b3523d3074a271dec286d5e
+cp %{_builddir}/bro-2.6.4/src/3rdparty/caf/LICENSE_ALTERNATIVE %{buildroot}/usr/share/package-licenses/bro/3cba29011be2b9d59f6204d6fa0a386b1b2dbd90
+cp %{_builddir}/bro-2.6.4/src/3rdparty/caf/libcaf_python/third_party/pybind/LICENSE %{buildroot}/usr/share/package-licenses/bro/71a7f368f90789db807331860cb72d10abdb4acb
+cp %{_builddir}/bro-2.6.4/src/3rdparty/caf/libcaf_python/third_party/pybind/tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/bro/0ebae4fcb66d6688d40b27451ac84cf5b5c8862a
 pushd clr-build
 %make_install
 popd
@@ -1940,45 +1938,19 @@ rm -f %{buildroot}/usr/include/binpac.h.in
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/bro/COPYING
-/usr/share/package-licenses/bro/aux_bifcl_COPYING
-/usr/share/package-licenses/bro/aux_bifcl_cmake_COPYING
-/usr/share/package-licenses/bro/aux_binpac_COPYING
-/usr/share/package-licenses/bro/aux_binpac_cmake_COPYING
-/usr/share/package-licenses/bro/aux_bro-aux_COPYING
-/usr/share/package-licenses/bro/aux_bro-aux_cmake_COPYING
-/usr/share/package-licenses/bro/aux_bro-aux_plugin-support_skeleton_COPYING.edit-me
-/usr/share/package-licenses/bro/aux_broccoli_COPYING
-/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-python_COPYING
-/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-python_cmake_COPYING
-/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-ruby_COPYING
-/usr/share/package-licenses/bro/aux_broccoli_bindings_broccoli-ruby_cmake_COPYING
-/usr/share/package-licenses/bro/aux_broccoli_cmake_COPYING
-/usr/share/package-licenses/bro/aux_broctl_COPYING
-/usr/share/package-licenses/bro/aux_broctl_aux_capstats_COPYING
-/usr/share/package-licenses/bro/aux_broctl_aux_capstats_cmake_COPYING
-/usr/share/package-licenses/bro/aux_broctl_aux_pysubnettree_COPYING
-/usr/share/package-licenses/bro/aux_broctl_aux_pysubnettree_cmake_COPYING
-/usr/share/package-licenses/bro/aux_broctl_aux_trace-summary_COPYING
-/usr/share/package-licenses/bro/aux_broctl_aux_trace-summary_cmake_COPYING
-/usr/share/package-licenses/bro/aux_broctl_cmake_COPYING
-/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE
-/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_LICENSE_ALTERNATIVE
-/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
-/usr/share/package-licenses/bro/aux_broker_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
-/usr/share/package-licenses/bro/aux_broker_COPYING
-/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_LICENSE
-/usr/share/package-licenses/bro/aux_broker_bindings_python_3rdparty_pybind11_tools_clang_LICENSE.TXT
-/usr/share/package-licenses/bro/aux_broker_cmake_COPYING
-/usr/share/package-licenses/bro/aux_broker_tests_benchmark_readerwriterqueue_LICENSE.md
-/usr/share/package-licenses/bro/aux_btest_COPYING
-/usr/share/package-licenses/bro/aux_netcontrol-connectors_COPYING
-/usr/share/package-licenses/bro/cmake_COPYING
-/usr/share/package-licenses/bro/doc_LICENSE
-/usr/share/package-licenses/bro/src_3rdparty_caf_LICENSE
-/usr/share/package-licenses/bro/src_3rdparty_caf_LICENSE_ALTERNATIVE
-/usr/share/package-licenses/bro/src_3rdparty_caf_libcaf_python_third_party_pybind_LICENSE
-/usr/share/package-licenses/bro/src_3rdparty_caf_libcaf_python_third_party_pybind_tools_clang_LICENSE.TXT
+/usr/share/package-licenses/bro/095bff679080110031d9603cd5678de136085197
+/usr/share/package-licenses/bro/0ebae4fcb66d6688d40b27451ac84cf5b5c8862a
+/usr/share/package-licenses/bro/38a91fe77596c51b40b5192189c1de2a1396e127
+/usr/share/package-licenses/bro/3ab1c7ffea3eb25703969e96f8f4a62ba6e36345
+/usr/share/package-licenses/bro/3cba29011be2b9d59f6204d6fa0a386b1b2dbd90
+/usr/share/package-licenses/bro/3d1626ff5f531f387f20f25b36500bbe1f960e3d
+/usr/share/package-licenses/bro/5e33d4674a821a666e7bb1fb7717d193ac234713
+/usr/share/package-licenses/bro/6daa99a30d82f8786b3523d3074a271dec286d5e
+/usr/share/package-licenses/bro/71a7f368f90789db807331860cb72d10abdb4acb
+/usr/share/package-licenses/bro/7ba045683ca423eb9191e47cd13b80d9f8133d98
+/usr/share/package-licenses/bro/a33b61f04391a38904373d020e7fbabf211383f6
+/usr/share/package-licenses/bro/e85bbc8175bc6b4a99301cd29a2f05118656b547
+/usr/share/package-licenses/bro/f2a190e0c1ddda28af4457907d2233f33d1f5fe5
 
 %files man
 %defattr(0644,root,root,0755)
