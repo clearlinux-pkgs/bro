@@ -511,6 +511,7 @@ libbroker.so.0:sqlite3_db_readonly
 libbroker.so.0:sqlite3_db_release_memory
 libbroker.so.0:sqlite3_db_status
 libbroker.so.0:sqlite3_declare_vtab
+libbroker.so.0:sqlite3_drop_modules
 libbroker.so.0:sqlite3_enable_shared_cache
 libbroker.so.0:sqlite3_errcode
 libbroker.so.0:sqlite3_errmsg
@@ -608,6 +609,7 @@ libbroker.so.0:sqlite3_status
 libbroker.so.0:sqlite3_status64
 libbroker.so.0:sqlite3_step
 libbroker.so.0:sqlite3_stmt_busy
+libbroker.so.0:sqlite3_stmt_isexplain
 libbroker.so.0:sqlite3_stmt_readonly
 libbroker.so.0:sqlite3_stmt_status
 libbroker.so.0:sqlite3_str_append
@@ -645,6 +647,7 @@ libbroker.so.0:sqlite3_value_bytes16
 libbroker.so.0:sqlite3_value_double
 libbroker.so.0:sqlite3_value_dup
 libbroker.so.0:sqlite3_value_free
+libbroker.so.0:sqlite3_value_frombind
 libbroker.so.0:sqlite3_value_int
 libbroker.so.0:sqlite3_value_int64
 libbroker.so.0:sqlite3_value_nochange

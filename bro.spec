@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.4
-Release  : 19
+Release  : 20
 URL      : https://www.bro.org/downloads/bro-2.6.4.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.4.tar.gz
 Source1 : https://www.bro.org/downloads/bro-2.6.4.tar.gz.asc
@@ -49,6 +49,7 @@ BuildRequires : swig
 BuildRequires : texlive
 BuildRequires : zlib-dev
 Patch1: Update-to-SQLite-3.30.1.patch
+Patch2: build-Use-a-single-SQLite-src.patch
 
 %description
 Broccoli enables your applications to speak the Bro communication protocol,
@@ -154,13 +155,14 @@ staticdev components for the bro package.
 %setup -q -n bro-2.6.4
 cd %{_builddir}/bro-2.6.4
 %patch1 -p1
+%patch2 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1573098809
+export SOURCE_DATE_EPOCH=1574142418
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -176,7 +178,7 @@ make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1573098809
+export SOURCE_DATE_EPOCH=1574142418
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp %{_builddir}/bro-2.6.4/COPYING %{buildroot}/usr/share/package-licenses/bro/095bff679080110031d9603cd5678de136085197
