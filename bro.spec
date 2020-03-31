@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.4
-Release  : 29
+Release  : 30
 URL      : https://www.bro.org/downloads/bro-2.6.4.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.4.tar.gz
 Source1  : https://sqlite.org/2020/sqlite-autoconf-3310100.tar.gz
@@ -50,6 +50,7 @@ BuildRequires : swig
 BuildRequires : texlive
 BuildRequires : zlib-dev
 Patch1: build-Use-a-single-SQLite-src.patch
+Patch2: CVE-2020-9327.patch
 
 %description
 Broccoli enables your applications to speak the Bro communication protocol,
@@ -159,13 +160,14 @@ cd %{_builddir}/bro-2.6.4
 mkdir -p src/3rdparty/
 cp -r %{_builddir}/sqlite-autoconf-3310100/* %{_builddir}/bro-2.6.4/src/3rdparty/
 %patch1 -p1
+%patch2 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1585696632
+export SOURCE_DATE_EPOCH=1585698823
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -181,7 +183,7 @@ make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1585696632
+export SOURCE_DATE_EPOCH=1585698823
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp %{_builddir}/bro-2.6.4/COPYING %{buildroot}/usr/share/package-licenses/bro/095bff679080110031d9603cd5678de136085197
