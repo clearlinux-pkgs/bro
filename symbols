@@ -523,6 +523,9 @@ libbroker.so.0:sqlite3_expired
 libbroker.so.0:sqlite3_extended_errcode
 libbroker.so.0:sqlite3_extended_result_codes
 libbroker.so.0:sqlite3_file_control
+libbroker.so.0:sqlite3_filename_database
+libbroker.so.0:sqlite3_filename_journal
+libbroker.so.0:sqlite3_filename_wal
 libbroker.so.0:sqlite3_finalize
 libbroker.so.0:sqlite3_free
 libbroker.so.0:sqlite3_free_table
@@ -530,6 +533,7 @@ libbroker.so.0:sqlite3_get_autocommit
 libbroker.so.0:sqlite3_get_auxdata
 libbroker.so.0:sqlite3_get_table
 libbroker.so.0:sqlite3_global_recover
+libbroker.so.0:sqlite3_hard_heap_limit64
 libbroker.so.0:sqlite3_initialize
 libbroker.so.0:sqlite3_interrupt
 libbroker.so.0:sqlite3_keyword_check
@@ -639,6 +643,7 @@ libbroker.so.0:sqlite3_transfer_bindings
 libbroker.so.0:sqlite3_update_hook
 libbroker.so.0:sqlite3_uri_boolean
 libbroker.so.0:sqlite3_uri_int64
+libbroker.so.0:sqlite3_uri_key
 libbroker.so.0:sqlite3_uri_parameter
 libbroker.so.0:sqlite3_user_data
 libbroker.so.0:sqlite3_value_blob

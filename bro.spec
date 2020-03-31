@@ -7,10 +7,11 @@
 %define keepstatic 1
 Name     : bro
 Version  : 2.6.4
-Release  : 28
+Release  : 29
 URL      : https://www.bro.org/downloads/bro-2.6.4.tar.gz
 Source0  : https://www.bro.org/downloads/bro-2.6.4.tar.gz
-Source1  : https://www.bro.org/downloads/bro-2.6.4.tar.gz.asc
+Source1  : https://sqlite.org/2020/sqlite-autoconf-3310100.tar.gz
+Source2  : https://www.bro.org/downloads/bro-2.6.4.tar.gz.asc
 Summary  : The Bro Client Communications Library
 Group    : Development/Tools
 License  : BSD-2-Clause BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC-BY-4.0 NCSA
@@ -48,8 +49,7 @@ BuildRequires : ruby
 BuildRequires : swig
 BuildRequires : texlive
 BuildRequires : zlib-dev
-Patch1: Update-to-SQLite-3.30.1.patch
-Patch2: build-Use-a-single-SQLite-src.patch
+Patch1: build-Use-a-single-SQLite-src.patch
 
 %description
 Broccoli enables your applications to speak the Bro communication protocol,
@@ -84,7 +84,6 @@ Requires: bro-lib = %{version}-%{release}
 Requires: bro-bin = %{version}-%{release}
 Requires: bro-data = %{version}-%{release}
 Provides: bro-devel = %{version}-%{release}
-Requires: bro = %{version}-%{release}
 Requires: bro = %{version}-%{release}
 
 %description dev
@@ -147,7 +146,6 @@ python3 components for the bro package.
 Summary: staticdev components for the bro package.
 Group: Default
 Requires: bro-dev = %{version}-%{release}
-Requires: bro-dev = %{version}-%{release}
 
 %description staticdev
 staticdev components for the bro package.
@@ -155,33 +153,35 @@ staticdev components for the bro package.
 
 %prep
 %setup -q -n bro-2.6.4
+cd %{_builddir}
+tar xf %{_sourcedir}/sqlite-autoconf-3310100.tar.gz
 cd %{_builddir}/bro-2.6.4
+mkdir -p src/3rdparty/
+cp -r %{_builddir}/sqlite-autoconf-3310100/* %{_builddir}/bro-2.6.4/src/3rdparty/
 %patch1 -p1
-%patch2 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1582902923
+export SOURCE_DATE_EPOCH=1585696632
 mkdir -p clr-build
 pushd clr-build
-# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
-export FCFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
-export FFLAGS="$CFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
-export CXXFLAGS="$CXXFLAGS -O3 -fcf-protection=full -ffat-lto-objects -flto=4 -fstack-protector-strong "
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
 %cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DBRO_ROOT_DIR=/usr -DBRO_ETC_INSTALL_DIR=/etc -DINSTALL_BROCTL=true -DBRO_LOCAL_STATE_DIR=/var -DBRO_SPOOL_DIR=/var/spool/bro -DBRO_LOG_DIR=/var/log/nsm/bro
 make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1582902923
+export SOURCE_DATE_EPOCH=1585696632
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/bro
 cp %{_builddir}/bro-2.6.4/COPYING %{buildroot}/usr/share/package-licenses/bro/095bff679080110031d9603cd5678de136085197
